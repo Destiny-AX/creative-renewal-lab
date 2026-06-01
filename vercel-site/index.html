@@ -1,0 +1,2802 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创意续命实验台 · 概念设计</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      /* 主色系（蓝） */
+      --primary: #0066FF;
+      --primary-dark: #0044CC;
+      --primary-soft: #E6F0FF;
+      /* 语义色 */
+      --success: #00B87A;
+      --success-soft: #E6F8F1;
+      --warning: #FF9500;
+      --warning-soft: #FFF4E6;
+      --danger: #FF3B30;
+      --danger-soft: #FFE5E5;
+      /* 文本与表面 */
+      --text-primary: #1D1D1F;
+      --text-secondary: #515156;
+      --text-tertiary: #8A8A92;
+      --border: #E5E5EA;
+      --border-strong: #D1D1D6;
+      --surface: #FFFFFF;
+      --surface-elevated: #FFFFFF;
+      --background: #F5F5F7;
+      /* 阴影分层（sm 用于轻量统计卡，md 默认卡片，lg 悬浮态） */
+      --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow: 0 4px 16px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.12), 0 4px 8px rgba(15, 23, 42, 0.06);
+      /* 圆角与过渡曲线 */
+      --radius: 16px;
+      --radius-sm: 10px;
+      --radius-xs: 6px;
+      --transition: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+      --transition-spring: 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+      /* 数字使用等宽数字 */
+      --num-features: "tnum" 1, "lnum" 1;
+    }
+
+    /* 尊重用户系统减弱动画偏好 */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+
+    /* 全局键盘焦点指示：仅对键盘聚焦显示，鼠标点击不显示 */
+    :focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: var(--radius-xs);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background: linear-gradient(180deg, #FAFBFD 0%, #F0F2F5 100%);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+    }
+
+    /* 长文本/标题排版优化 */
+    h1, h2, h3 { text-wrap: balance; }
+    p { text-wrap: pretty; }
+
+    .header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 20px 32px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
+
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary) 0%, #0044CC 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      font-size: 18px;
+    }
+
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 4px;
+      background: var(--background);
+      padding: 4px;
+      border-radius: var(--radius);
+    }
+
+    .nav-tab {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .nav-tab:hover {
+      color: var(--text-primary);
+    }
+
+    .nav-tab.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow);
+    }
+
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 4px;
+    }
+
+    .stepper-step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 8px 16px;
+      border-radius: 12px;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+      white-space: nowrap;
+      /* 重置 button 默认样式 */
+      background: transparent;
+      border: none;
+      color: inherit;
+      font: inherit;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .stepper-step:active {
+      transform: scale(0.97);
+    }
+
+    .stepper-step:hover {
+      background: var(--primary-soft);
+    }
+
+    .stepper-node {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+      flex-shrink: 0;
+    }
+
+    .stepper-step.completed .stepper-node {
+      background: var(--primary);
+      color: white;
+    }
+
+    .stepper-step.current .stepper-node {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 0 0 4px var(--primary-soft);
+      animation: pulse 2s infinite;
+    }
+
+    .stepper-step.upcoming .stepper-node {
+      background: var(--background);
+      color: var(--text-tertiary);
+      border: 2px solid var(--border);
+    }
+
+    .stepper-label {
+      font-size: 13px;
+      font-weight: 600;
+      transition: color var(--transition);
+    }
+
+    .stepper-step.completed .stepper-label,
+    .stepper-step.current .stepper-label {
+      color: var(--primary);
+    }
+
+    .stepper-step.upcoming .stepper-label {
+      color: var(--text-tertiary);
+    }
+
+    .stepper-line {
+      width: 32px;
+      height: 2px;
+      background: var(--border);
+      transition: background var(--transition);
+      flex-shrink: 0;
+    }
+
+    .stepper-line.completed {
+      background: var(--primary);
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 4px var(--primary-soft); }
+      50% { box-shadow: 0 0 0 8px rgba(0, 102, 255, 0.1); }
+    }
+
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px;
+    }
+
+    .module {
+      display: none;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .module.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .module-header {
+      margin-bottom: 28px;
+    }
+
+    .module-title {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+
+    .module-desc {
+      color: var(--text-secondary);
+      font-size: 16px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 24px;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1.5fr 1fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-4 {
+      grid-template-columns: repeat(4, 1fr);
+    }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+    }
+
+    @media (hover: hover) {
+      .card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        border-color: var(--border-strong);
+      }
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+
+    .badge-warning {
+      background: var(--warning-soft);
+      color: var(--warning);
+    }
+
+    .badge-success {
+      background: var(--success-soft);
+      color: var(--success);
+    }
+
+    .badge-primary {
+      background: var(--primary-soft);
+      color: var(--primary);
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      padding: 20px 24px;
+      box-shadow: var(--shadow-sm);
+      transition: box-shadow var(--transition), transform var(--transition), border-color var(--transition);
+    }
+
+    .stat-card:hover {
+      box-shadow: var(--shadow);
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      margin-bottom: 6px;
+      font-variant-numeric: tabular-nums lining-nums;
+      line-height: 1.15;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .stat-trend {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .trend-up {
+      color: var(--success);
+    }
+
+    .trend-down {
+      color: var(--danger);
+    }
+
+    .material-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px;
+      background: var(--background);
+      border-radius: var(--radius-sm);
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .material-item:hover {
+      background: var(--primary-soft);
+    }
+
+    .material-item.selected {
+      background: var(--primary-soft);
+      border: 2px solid var(--primary);
+    }
+
+    .quick-renew-btn {
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: none;
+      background: linear-gradient(135deg, var(--primary) 0%, #0044CC 100%);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+      white-space: nowrap;
+      flex-shrink: 0;
+      align-self: center;
+    }
+
+    .quick-renew-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(0, 102, 255, 0.4);
+    }
+
+    .material-preview {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #E6F0FF 0%, #F0F7FF 100%);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .material-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .material-name {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .material-metrics {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform var(--transition), box-shadow var(--transition), background var(--transition), color var(--transition), border-color var(--transition);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 102, 255, 0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0, 102, 255, 0.35);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0) scale(0.97);
+      box-shadow: 0 2px 8px rgba(0, 102, 255, 0.3);
+    }
+
+    .btn-secondary {
+      background: var(--background);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface);
+      border-color: var(--border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .btn-large {
+      padding: 16px 32px;
+      font-size: 16px;
+    }
+
+    .variant-card {
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .variant-card:hover {
+      border-color: var(--primary);
+    }
+
+    .variant-card.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .variant-card.control {
+      border-style: dashed;
+      background: var(--background);
+      cursor: default;
+    }
+
+    .variant-card.control:hover {
+      border-color: var(--border);
+      transform: none;
+    }
+
+    .variant-split {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .variant-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .variant-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 2px solid var(--border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .variant-row:hover {
+      border-color: var(--primary);
+    }
+
+    .variant-row.selected {
+      border-color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .variant-row.control {
+      border-style: dashed;
+      background: var(--background);
+      cursor: default;
+    }
+
+    .variant-row.control:hover {
+      border-color: var(--border);
+    }
+
+    .variant-row .row-id {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      min-width: 90px;
+    }
+
+    .variant-row .row-title {
+      flex: 1;
+      min-width: 0;
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .variant-row .row-ctr {
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .phone-frame {
+      width: 280px;
+      height: 560px;
+      background: var(--surface);
+      border-radius: 36px;
+      border: 3px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      margin: 0 auto;
+    }
+
+    .phone-status-bar {
+      height: 36px;
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .phone-content {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-cover {
+      height: 200px;
+      background: linear-gradient(135deg, #E6F0FF 0%, #F0E6FF 50%, #FFE6F0 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .phone-cover-text {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .phone-body {
+      padding: 16px;
+      flex: 1;
+    }
+
+    .phone-selling-point {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      font-size: 13px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .phone-selling-point:last-child {
+      border-bottom: none;
+    }
+
+    .phone-cta {
+      margin: 16px 16px 0;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--primary) 0%, #0044CC 100%);
+      color: white;
+      text-align: center;
+      border-radius: 24px;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .phone-home-indicator {
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .phone-home-indicator::after {
+      content: '';
+      width: 100px;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-content {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 32px;
+      max-width: 560px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      transform: translateY(20px);
+      transition: transform 0.3s ease;
+    }
+
+    .modal-overlay.active .modal-content {
+      transform: translateY(0);
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: var(--background);
+      color: var(--text-secondary);
+      font-size: 16px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .modal-close:hover {
+      background: var(--border);
+    }
+
+    .audit-item {
+      padding: 16px;
+      border-radius: var(--radius-sm);
+      background: var(--background);
+      margin-bottom: 12px;
+    }
+
+    .audit-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .audit-variant-id {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .audit-row {
+      display: flex;
+      gap: 8px;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+
+    .audit-label {
+      color: var(--text-tertiary);
+      min-width: 60px;
+      flex-shrink: 0;
+    }
+
+    .audit-value {
+      color: var(--text-primary);
+    }
+
+    .audit-rewrite {
+      padding: 8px 12px;
+      background: var(--warning-soft);
+      border-radius: 6px;
+      margin-top: 8px;
+      font-size: 12px;
+    }
+
+    .compliance-clickable {
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .compliance-clickable:hover {
+      box-shadow: var(--shadow-lg);
+      transform: translateY(-2px);
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--background);
+      cursor: pointer;
+      outline: none;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+      min-width: 140px;
+    }
+
+    .filter-select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .filter-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      background: var(--primary-soft);
+      color: var(--primary);
+      margin-left: auto;
+    }
+
+    .view-toggle {
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--background);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .view-toggle:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .view-toggle.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .variable-item {
+      padding: 12px;
+      background: var(--background);
+      border-radius: 8px;
+      border: 2px solid transparent;
+      opacity: 0.6;
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+    }
+
+    .variable-item.active {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      opacity: 1;
+    }
+
+    .variable-item.active .variable-item-title::before {
+      content: '✓ ';
+    }
+
+    .variant-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .variant-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .variant-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .progress-ring {
+      width: 120px;
+      height: 120px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .progress-ring {
+      width: 130px;
+      height: 130px;
+      position: relative;
+      margin: 0 auto;
+    }
+
+    .progress-ring-circle {
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+      transition: stroke-dashoffset 800ms cubic-bezier(0.16, 1, 0.3, 1);
+      stroke-linecap: round;
+    }
+
+    .progress-text {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+
+    .progress-value {
+      font-size: 28px;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .progress-label {
+      font-size: 10px;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .chart-bar {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      height: 140px;
+      padding: 16px 0 32px;
+    }
+
+    .bar {
+      flex: 1;
+      background: linear-gradient(180deg, var(--primary-soft) 0%, #DDE9FF 100%);
+      border-radius: 6px 6px 0 0;
+      transition: filter var(--transition), transform var(--transition);
+      position: relative;
+      min-height: 20px;
+      cursor: pointer;
+    }
+
+    .bar:hover {
+      filter: brightness(0.96);
+      transform: translateY(-2px);
+    }
+
+    .bar.active {
+      background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+      box-shadow: 0 6px 18px rgba(0, 102, 255, 0.3);
+    }
+
+    .bar-label {
+      position: absolute;
+      bottom: -28px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      font-weight: 600;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .timeline {
+      position: relative;
+      padding-left: 32px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 11px;
+      top: 4px;
+      bottom: 4px;
+      width: 2px;
+      background: var(--border);
+      border-radius: 1px;
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 24px;
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      /* 圆点中心需与连线中心（整体 left 12px）对齐：
+         dot 宽 12px，box-shadow 不占布局尺寸；
+         dot 相对 .timeline-item 的内容区起点（容器 left=32px）偏移 -26px，
+         即整体 left = 32 - 26 = 6px，圆心 = 6 + 6 = 12px。✓ */
+      left: -26px;
+      top: 4px;
+      width: 12px;
+      height: 12px;
+      background: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 0 4px var(--surface), 0 0 0 6px var(--primary-soft);
+    }
+
+    .timeline-title {
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+
+    .timeline-desc {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .field-input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      background: var(--background);
+      transition: background var(--transition), color var(--transition), border-color var(--transition), box-shadow var(--transition), transform var(--transition), opacity var(--transition);
+      outline: none;
+    }
+
+    .field-input:focus {
+      border-color: var(--primary);
+      background: var(--surface);
+      box-shadow: 0 0 0 3px var(--primary-soft);
+    }
+
+    .field-input.sm {
+      width: 80px;
+      text-align: center;
+    }
+
+    .preset-btn {
+      padding: 4px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xs);
+      background: var(--surface);
+      color: var(--text-secondary);
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+      line-height: 1.4;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+    }
+
+    .preset-btn.active {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-soft);
+      font-weight: 600;
+    }
+
+    .variant-id {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 1200px) {
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        padding: 16px 20px;
+      }
+
+      .main {
+        padding: 20px;
+      }
+
+      .module-title {
+        font-size: 24px;
+      }
+
+      .nav-tabs {
+        flex-wrap: wrap;
+      }
+    }
+
+    /* 实验完成 Toast：顶部居中悬浮条，不遮挡内容，可点击跳转到复盘 */
+    .exp-toast {
+      position: fixed;
+      top: 88px;                /* 紧贴 header 下方，header 高度约 80px */
+      left: 50%;
+      transform: translate(-50%, -16px);
+      max-width: 560px;
+      width: max-content;
+      padding: 12px 20px;
+      background: var(--surface);
+      border-radius: 999px;     /* 胶囊形，视觉更轻 */
+      box-shadow: 0 6px 24px rgba(0, 102, 255, 0.18);
+      border: 1px solid var(--success);
+      cursor: pointer;
+      z-index: 2000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      opacity: 0;
+      pointer-events: none;
+      transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+    }
+    .exp-toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .exp-toast:hover {
+      box-shadow: 0 10px 32px rgba(0, 102, 255, 0.28);
+    }
+    .exp-toast-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--success-soft);
+      color: var(--success);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .exp-toast-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+    .exp-toast-sub {
+      font-size: 12px;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+    .exp-toast-cta {
+      font-size: 12px;
+      color: var(--primary);
+      font-weight: 700;
+      margin-left: 4px;
+      white-space: nowrap;
+    }
+    .exp-toast-close {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: none;
+      background: var(--background);
+      color: var(--text-tertiary);
+      font-size: 11px;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-left: 4px;
+    }
+    @media (max-width: 768px) {
+      .exp-toast {
+        max-width: calc(100% - 24px);
+        flex-wrap: wrap;
+      }
+      .exp-toast-title,
+      .exp-toast-sub,
+      .exp-toast-cta {
+        white-space: normal;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <div class="logo-icon">CL</div>
+        <div>
+          <div class="logo-text">创意续命实验台</div>
+          <div class="logo-sub">AI Creative Renewal Lab</div>
+        </div>
+      </div>
+      <nav class="stepper" id="stepper">
+        <button type="button" class="stepper-step current" data-module="diagnosis" aria-current="step" onclick="switchModule('diagnosis')">
+          <div class="stepper-node">1</div>
+          <span class="stepper-label">疲劳诊断</span>
+        </button>
+        <div class="stepper-line" id="line1" aria-hidden="true"></div>
+        <button type="button" class="stepper-step upcoming" data-module="workbench" onclick="switchModule('workbench')">
+          <div class="stepper-node">2</div>
+          <span class="stepper-label">智能续命</span>
+        </button>
+        <div class="stepper-line" id="line2" aria-hidden="true"></div>
+        <button type="button" class="stepper-step upcoming" data-module="review" onclick="switchModule('review')">
+          <div class="stepper-node">3</div>
+          <span class="stepper-label">复盘看板</span>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main">
+    <!-- 模块1: 疲劳诊断中心 -->
+    <section class="module active" id="diagnosis">
+      <div class="module-header">
+        <h1 class="module-title">疲劳诊断中心</h1>
+        <p class="module-desc" id="diagnosisSelected">当前选中：<strong>A03 · 熬夜脸急救</strong> — 点击左侧素材切换查看</p>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom: 28px;">
+        <div class="stat-card" style="border-left: 4px solid var(--danger);">
+          <div class="stat-value">3/8</div>
+          <div class="stat-label">全部高疲劳素材</div>
+          <div class="stat-trend trend-down">
+            <span>全局数据，不受选中影响</span>
+          </div>
+        </div>
+        <div class="stat-card" id="statCtrCard">
+          <div class="stat-value" id="statCtr">-37.9%</div>
+          <div class="stat-label"><span id="statCtrLabel">CTR下滑幅度</span></div>
+          <div class="stat-trend trend-down" id="statCtrTrend">
+            <span id="statCtrDetail">1.82% → 1.13%</span>
+          </div>
+        </div>
+        <div class="stat-card" id="statFatigueCard">
+          <div class="stat-value" id="statFatigue">88</div>
+          <div class="stat-label">疲劳指数</div>
+          <div class="stat-trend trend-down" id="statFatigueTrend">
+            <span id="statFatigueLevel">高风险</span>
+          </div>
+        </div>
+        <div class="stat-card" id="statVariableCard">
+          <div class="stat-value" id="statVariable">钩子</div>
+          <div class="stat-label">推荐主变量</div>
+          <div class="stat-trend trend-up" id="statImproveTrend">
+            <span id="statImprove">预计提升 +39.8%</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="filter-group">
+          <span class="filter-label">Campaign</span>
+          <select class="filter-select" id="filterCampaign" onchange="applyFilters()">
+            <option value="glowlab">GlowLab 焕亮修护精华</option>
+            <option value="all">全部 Campaign</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">内容形态</span>
+          <select class="filter-select" id="filterFormat" onchange="applyFilters()">
+            <option value="image-text">图文信息流</option>
+            <option value="video">短视频</option>
+            <option value="live">直播切片</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">投放阶段</span>
+          <select class="filter-select" id="filterStage" onchange="applyFilters()">
+            <option value="active">放量中 + 稳定期</option>
+            <option value="decline">衰退期</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">时间窗口</span>
+          <select class="filter-select" id="filterWindow" onchange="applyFilters()">
+            <option value="7d">近7日</option>
+            <option value="14d">近14日</option>
+            <option value="30d">近30日</option>
+          </select>
+        </div>
+        <span class="filter-badge" id="filterResult">4条素材 · 3条需关注</span>
+        <span style="font-size: 11px; color: var(--text-tertiary); margin-left: 8px;" title="冷启动期数据样本不足，CTR/收藏率波动剧烈，纳入计算会产生大量假阳性，因此默认不参与疲劳诊断">ⓘ 冷启动期默认已排除（避免误杀）</span>
+      </div>
+
+      <div class="grid grid-2">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">素材列表</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="view-toggle active" data-view="high" onclick="setView('high')">只看高疲劳</button>
+              <button class="view-toggle" data-view="medium" onclick="setView('medium')">高+中</button>
+              <button class="view-toggle" data-view="all" onclick="setView('all')">全部</button>
+            </div>
+          </div>
+
+          <div id="materialList"></div>
+
+          <div id="loadMoreContainer" style="text-align: center; margin-top: 16px; display: none;">
+            <button class="btn btn-secondary" onclick="loadMore()" style="width: 100%;">加载更多素材 ↓</button>
+          </div>
+        </div>
+
+        <div class="card" id="analysisCard">
+          <div class="card-header">
+            <h2 class="card-title" id="analysisTitle">AI归因分析 · A03</h2>
+            <span class="card-badge badge-primary">智能诊断</span>
+          </div>
+
+          <div style="text-align: center; margin-bottom: 24px;">
+            <div class="progress-ring" id="progressRing"></div>
+          </div>
+
+          <div class="timeline" id="diagnosisTimeline"></div>
+
+          <div id="diagnosisRecommendation" style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border);"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 模块2: 智能续命工作台 -->
+    <section class="module" id="workbench">
+      <div class="module-header">
+        <h1 class="module-title">智能续命工作台</h1>
+        <p class="module-desc" id="workbenchDesc">AI推荐最优方案，一键生成合规变体</p>
+      </div>
+
+      <div class="grid grid-3" style="margin-bottom: 24px;">
+        <div class="card">
+          <div class="card-header" id="workbenchVariableHeader">
+            <h2 class="card-title">实验变量</h2>
+          </div>
+          <div id="variableList" style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="variable-item" data-variable="钩子">
+              <div style="font-weight: 600; font-size: 14px;">钩子表达</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">修改标题和入口文案</div>
+            </div>
+            <div class="variable-item" data-variable="视觉">
+              <div style="font-weight: 600; font-size: 14px;">视觉构图</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">修改封面图和视觉呈现</div>
+            </div>
+            <div class="variable-item" data-variable="卖点">
+              <div style="font-weight: 600; font-size: 14px;">卖点层级</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">调整卖点顺序和表达</div>
+            </div>
+            <div class="variable-item" data-variable="合规">
+              <div style="font-weight: 600; font-size: 14px;">合规表达</div>
+              <div style="font-size: 12px; color: var(--text-secondary);">优化合规风险表述</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">实验设置</h2>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">实验窗口</div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input class="field-input sm" type="number" value="72" min="24" max="168" id="expWindow">
+                <span style="font-size: 13px; color: var(--text-secondary);">小时</span>
+                <div style="display: flex; gap: 4px; margin-left: 4px;">
+                  <button type="button" class="preset-btn" onclick="document.getElementById('expWindow').value=24">24h</button>
+                  <button type="button" class="preset-btn" onclick="document.getElementById('expWindow').value=48">48h</button>
+                  <button type="button" class="preset-btn active" onclick="document.getElementById('expWindow').value=72">72h</button>
+                  <button type="button" class="preset-btn" onclick="document.getElementById('expWindow').value=120">120h</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">每组曝光</div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <input class="field-input sm" type="number" value="12000" min="1000" step="1000" id="expImpressions">
+                <span style="font-size: 13px; color: var(--text-secondary);">次</span>
+                <div style="display: flex; gap: 4px; margin-left: 4px;">
+                  <button type="button" class="preset-btn" onclick="document.getElementById('expImpressions').value=6000">6K</button>
+                  <button type="button" class="preset-btn active" onclick="document.getElementById('expImpressions').value=12000">12K</button>
+                  <button type="button" class="preset-btn" onclick="document.getElementById('expImpressions').value=24000">24K</button>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px;">核心指标</div>
+              <div id="expMetricLabel" style="font-size: 14px; font-weight: 600; color: var(--primary); padding: 8px 0;">CTR提升率</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card compliance-clickable" id="complianceCard" onclick="openComplianceModal()">
+          <div class="card-header">
+            <h2 class="card-title">合规预审</h2>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+            <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">全部通过</div>
+            <div style="font-size: 13px; color: var(--text-secondary);">已完成自动改写，可直接投放</div>
+            <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: center;">
+              <span class="badge-success" style="padding: 6px 12px;">B01 通过</span>
+              <span class="badge-warning" style="padding: 6px 12px;">B02 已改写</span>
+              <span class="badge-success" style="padding: 6px 12px;">B03 通过</span>
+            </div>
+            <div style="margin-top: 12px; font-size: 12px; color: var(--primary); font-weight: 600;">点击查看审计详情 →</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">生成的变体方案</h2>
+          <div style="display: flex; gap: 8px;">
+            <span class="card-badge badge-success">AI推荐</span>
+            <span class="card-badge badge-primary" id="variantCountBadge">3个方案</span>
+          </div>
+        </div>
+
+        <div class="variant-split" style="margin-top: 20px;">
+          <div class="variant-list" id="variantListContainer">
+            <!-- 动态渲染 -->
+          </div>
+
+          <div class="phone-frame">
+            <div class="phone-status-bar">9:41</div>
+            <div class="phone-content" id="phonePreview"></div>
+            <div class="phone-home-indicator"></div>
+          </div>
+        </div>
+
+        <div id="experimentActionArea" style="margin-top: 28px; display: flex; gap: 12px; justify-content: flex-end;">
+          <button class="btn btn-secondary" onclick="switchModule('diagnosis')">← 上一步：疲劳诊断</button>
+          <button class="btn btn-primary btn-large" onclick="submitExperiment()">提交实验 →</button>
+        </div>
+
+        <!-- 实验运行中 / 已完成状态区，由 showRunningArea() 在 JS 中根据当前素材实验状态动态填充 -->
+        <div id="experimentRunningArea" style="margin-top: 28px; padding: 24px; background: var(--primary-soft); border-radius: var(--radius-sm); display: none;"></div>
+      </div>
+    </section>
+
+    <!-- 模块3: 复盘看板 -->
+    <section class="module" id="review">
+      <div class="module-header">
+        <h1 class="module-title">复盘看板</h1>
+        <p class="module-desc">数据驱动决策，沉淀有效经验</p>
+      </div>
+
+      <div style="margin-bottom: 20px; padding: 16px; background: var(--success-soft); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 12px;" id="reviewBanner">
+        <span style="font-size: 20px;">✓</span>
+        <div>
+          <span style="font-size: 14px; font-weight: 600; color: var(--success);" id="reviewBannerTitle">实验已完成 · 72小时数据已出</span>
+          <span style="font-size: 13px; color: var(--text-secondary); margin-left: 12px;" id="reviewBannerSub">A03 · 钩子表达实验 · 2026-05-21 14:30 完成</span>
+        </div>
+      </div>
+
+      <div class="grid grid-4" style="margin-bottom: 28px;">
+        <div class="stat-card">
+          <div class="stat-value" id="reviewStatImprove">+39.8%</div>
+          <div class="stat-label" id="reviewStatImproveLabel">CTR提升</div>
+          <div class="stat-trend trend-up">
+            <span id="reviewStatImproveSub">B01 vs 对照组（实验结果）</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="reviewStatBest">1.58%</div>
+          <div class="stat-label" id="reviewStatBestLabel">最优CTR</div>
+          <div class="stat-trend trend-up">
+            <span id="reviewStatBestSub">B01变体（实测）</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="reviewStatWinner">B01</div>
+          <div class="stat-label">放量候选</div>
+          <div class="stat-trend trend-up">
+            <span>推荐投放</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">1</div>
+          <div class="stat-label">知识更新</div>
+          <div class="stat-trend trend-up">
+            <span>新增经验</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-2" id="reviewContent">
+        <!-- 动态渲染 -->
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-overlay" id="complianceModal" onclick="if(event.target===this)closeComplianceModal()" role="dialog" aria-modal="true" aria-labelledby="complianceModalTitle">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="complianceModalTitle">合规审计详情</h3>
+        <button class="modal-close" onclick="closeComplianceModal()" aria-label="关闭弹窗">✕</button>
+      </div>
+      <div id="complianceModalBody">
+        <!-- 由 openComplianceModal() 根据当前素材变体动态填充 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- 实验完成浮动通知（顶部居中横条，点击直接跳到对应素材的复盘看板） -->
+  <div class="exp-toast" id="expToast" onclick="onExpToastClick()" role="status" aria-live="polite" aria-atomic="true">
+    <div class="exp-toast-icon">✓</div>
+    <span class="exp-toast-title" id="expToastTitle">实验已完成</span>
+    <span class="exp-toast-sub" id="expToastSub">A03 · 钩子表达实验 · 72小时数据已出</span>
+    <span class="exp-toast-cta">查看复盘 →</span>
+    <button class="exp-toast-close" onclick="event.stopPropagation(); hideExpToast();" aria-label="关闭实验完成通知">✕</button>
+  </div>
+
+  <script>
+    /* ---------- 素材级诊断数据 ---------- */
+    // 素材封面图映射表（用于素材列表缩略图与对照组手机预览）
+    const materialCovers = {
+      A02: 'images/a02-cover.png',
+      A03: 'images/a03-cover.png',
+      A04: 'images/a04-cover.png',
+      A05: 'images/a05-control.png',
+      A06: 'images/a06-cover.png',
+      A07: 'images/a07-cover.png',
+      A08: 'images/a08-cover.png',
+      A09: 'images/a09-cover.png'
+    };
+
+    const materialDiagnosis = {
+      A03: {
+        name: '熬夜脸急救',
+        ctr: { from: 1.82, to: 1.13, decline: 37.9 },
+        saveRate: { from: 0.64, to: 0.42, decline: 34.4 },
+        frequency: 3.8,
+        fatigue: 88,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+39.8%',
+        diagnosis: '入口钩子重复，第一眼进入理由变弱；产品图和卖点层级仍可保留。',
+        timeline: [
+          { title: '钩子重复度高', desc: '"熬夜急救"出现频率过高，用户产生审美疲劳' },
+          { title: 'CTR 持续下滑', desc: '从 1.82% 降至 1.13%，降幅达 37.9%' },
+          { title: '评论负面信号', desc: '18% 评论提到"像之前那条""开头没新意"' }
+        ],
+        recommendation: '只改钩子和入口文案；产品图、卖点层级、CTA、投放窗口保持不变。',
+        canRenew: true
+      },
+      A06: {
+        name: '成分科普',
+        ctr: { from: 1.36, to: 1.28, decline: 5.9 },
+        saveRate: { from: 0.71, to: 0.62, decline: 12.7 },
+        frequency: 2.4,
+        fatigue: 72,
+        level: 'medium',
+        variable: '卖点',
+        variableName: '卖点层级',
+        improve: '+12.0%',
+        diagnosis: '未达到高疲劳阈值（<80），问题更像转化承接弱而非创意疲劳，暂不作为本轮主素材。',
+        timeline: [
+          { title: '收藏率下滑明显', desc: '从 0.71% 降至 0.62%，下滑 12.7%，内容吸引力存疑' },
+          { title: 'CTR 轻微波动', desc: '从 1.36% 降至 1.28%，下降仅 5.9%，钩子仍有效' },
+          { title: '信息过载信号', desc: '7% 评论反馈"信息有点多""成分看不懂"' }
+        ],
+        recommendation: '问题出在卖点层级而非钩子；如后续疲劳分超过 80，建议优先测卖点顺序。',
+        canRenew: false
+      },
+      A08: {
+        name: '前后对比',
+        ctr: { from: 1.49, to: 1.31, decline: 12.1 },
+        saveRate: { from: 0.58, to: 0.50, decline: 13.8 },
+        frequency: 2.9,
+        fatigue: 69,
+        level: 'medium',
+        variable: '合规',
+        variableName: '合规优化',
+        improve: '—',
+        diagnosis: '存在合规风险（14% 评论质疑对比真实性），但表现下滑不如 A03 明显，本轮不优先处理。',
+        timeline: [
+          { title: '合规风险信号', desc: '14% 评论质疑对比真实性，可能触发平台审核' },
+          { title: '风险评论摘要', desc: '"对比是不是太夸张""效果看起来有点过"' },
+          { title: 'CTR 缓慢下滑', desc: '从 1.49% 降至 1.31%，降幅 12.1%，尚可接受' }
+        ],
+        recommendation: '建议优先修复合规表达后再考虑续命；一轮仍只测一个变量。',
+        canRenew: false
+      },
+      A01: {
+        name: '早八通勤',
+        ctr: { from: 1.51, to: 1.44, decline: 4.6 },
+        saveRate: { from: 0.56, to: 0.53, decline: 5.4 },
+        frequency: 2.1,
+        fatigue: 54,
+        level: 'healthy',
+        variable: '—',
+        variableName: '无需续命',
+        improve: '—',
+        diagnosis: '表现基本稳定，未进入疲劳期，继续观察。',
+        timeline: [
+          { title: '各项指标稳定', desc: 'CTR 和收藏率波动在正常范围内' },
+          { title: '低频率曝光', desc: '近 7 日频次仅 2.1，尚未达到重复触达阈值' },
+          { title: '正向评论反馈', desc: '"通勤场景挺真实"，受众认可场景设定' }
+        ],
+        recommendation: '素材表现健康，本轮无需干预；可继续作为常规投放素材使用。',
+        canRenew: false
+      },
+      A02: {
+        name: '熬夜急救',
+        ctr: { from: 2.1, to: 1.35, decline: 35.7 },
+        saveRate: { from: 0.68, to: 0.45, decline: 33.8 },
+        frequency: 4.2,
+        fatigue: 91,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+42.0%',
+        diagnosis: '高疲劳素材，钩子表达严重衰退，急需续命。',
+        timeline: [
+          { title: 'CTR大幅下滑', desc: '从 2.1% 降至 1.35%，降幅达 35.7%' },
+          { title: '高频曝光', desc: '人均曝光 4.2 次，已超过饱和阈值' },
+          { title: '评论负面', desc: '22% 评论表示"看腻了""又是这个开头"' }
+        ],
+        recommendation: '优先修改钩子表达，其他变量保持不变进行实验。',
+        canRenew: true
+      },
+      A04: {
+        name: '成分党',
+        ctr: { from: 1.18, to: 1.05, decline: 11.0 },
+        saveRate: { from: 0.72, to: 0.65, decline: 9.7 },
+        frequency: 2.8,
+        fatigue: 65,
+        level: 'medium',
+        variable: '卖点',
+        variableName: '卖点层级',
+        improve: '+15.0%',
+        diagnosis: '中疲劳，卖点层级需要优化。',
+        timeline: [
+          { title: 'CTR缓慢下滑', desc: '从 1.18% 降至 1.05%，降幅 11.0%' },
+          { title: '收藏率稳定', desc: '0.72% → 0.65%，内容仍有吸引力' },
+          { title: '信息密度高', desc: '12% 评论反馈"成分太多看不懂"' }
+        ],
+        recommendation: '优化卖点层级，减少信息密度，突出核心成分。',
+        canRenew: false
+      },
+      A05: {
+        name: '急救面膜',
+        ctr: { from: 1.95, to: 1.42, decline: 27.2 },
+        saveRate: { from: 0.61, to: 0.48, decline: 21.3 },
+        frequency: 3.5,
+        fatigue: 82,
+        level: 'high',
+        variable: '视觉',
+        variableName: '视觉构图',
+        improve: '+31.0%',
+        diagnosis: '高疲劳，视觉构图重复度高，需要更新封面。',
+        timeline: [
+          { title: '视觉疲劳', desc: '封面图与之前3条素材高度相似' },
+          { title: 'CTR下滑明显', desc: '从 1.95% 降至 1.42%，降幅 27.2%' },
+          { title: '点击意愿低', desc: '8% 评论"图都一样，不想点"' }
+        ],
+        recommendation: '更新视觉构图，尝试新的封面风格。',
+        canRenew: true
+      },
+      A07: {
+        name: '熬夜修复',
+        ctr: { from: 1.62, to: 1.38, decline: 14.8 },
+        saveRate: { from: 0.55, to: 0.50, decline: 9.1 },
+        frequency: 2.6,
+        fatigue: 71,
+        level: 'medium',
+        variable: '合规',
+        variableName: '合规优化',
+        improve: '—',
+        diagnosis: '中疲劳，存在轻微合规风险。',
+        timeline: [
+          { title: '合规信号', desc: '5% 评论质疑"修复效果是否真实"' },
+          { title: 'CTR波动', desc: '从 1.62% 降至 1.38%，降幅 14.8%' },
+          { title: '收藏率尚可', desc: '0.55% → 0.50%，用户仍有兴趣' }
+        ],
+        recommendation: '优先修复合规表达，再考虑续命。',
+        canRenew: false
+      },
+      A09: {
+        name: '急救精华',
+        ctr: { from: 2.3, to: 1.55, decline: 32.6 },
+        saveRate: { from: 0.75, to: 0.52, decline: 30.7 },
+        frequency: 4.5,
+        fatigue: 95,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+45.0%',
+        diagnosis: '极高疲劳，钩子表达完全失效，急需续命。',
+        timeline: [
+          { title: '极高疲劳', desc: '疲劳指数 95，远超阈值' },
+          { title: 'CTR暴跌', desc: '从 2.3% 降至 1.55%，降幅 32.6%' },
+          { title: '用户反感', desc: '28% 评论"又是这个开头""看吐了"' }
+        ],
+        recommendation: '紧急修改钩子表达，建议立即启动续命实验。',
+        canRenew: true
+      },
+      A10: {
+        name: '日常护肤',
+        ctr: { from: 1.35, to: 1.28, decline: 5.2 },
+        saveRate: { from: 0.48, to: 0.46, decline: 4.2 },
+        frequency: 1.9,
+        fatigue: 48,
+        level: 'healthy',
+        variable: '—',
+        variableName: '无需续命',
+        improve: '—',
+        diagnosis: '表现健康，各项指标稳定。',
+        timeline: [
+          { title: 'CTR稳定', desc: '1.35% → 1.28%，降幅仅 5.2%' },
+          { title: '收藏率健康', desc: '0.48% → 0.46%，波动很小' },
+          { title: '无负面反馈', desc: '评论中无疲劳相关信号' }
+        ],
+        recommendation: '继续常规投放，定期巡检即可。',
+        canRenew: false
+      }
+    };
+
+    let selectedMaterial = 'A03';
+    // 实验状态按素材级管理，支持并行追踪多个素材的实验
+    const experimentStates = {};  // { A03: { status: 'idle'|'running'|'completed', variantId: 'B01', startTime: '...', completedAt: '...' }, ... }
+
+    /* ---------- 全局筛选上下文 Store — Change 2 ---------- */
+    const filterState = {
+      campaign: 'glowlab',
+      format: 'image-text',
+      stage: 'active',
+      window: '7d',
+      view: 'high'
+    };
+
+    function updateFilterState(key, value) {
+      filterState[key] = value;
+      refreshAllByFilter();
+    }
+
+    function refreshAllByFilter() {
+      renderStats();
+      renderMaterialList();
+      renderDiagnosis();
+      renderFilterResultBadge();
+    }
+
+    function getExperimentState(materialId) {
+      return experimentStates[materialId] || { status: 'idle', variantId: null, startTime: null, completedAt: null };
+    }
+
+    function setExperimentState(materialId, state) {
+      experimentStates[materialId] = state;
+    }
+
+    /* ---------- DOM 引用 ---------- */
+    const modules = {
+      diagnosis: document.getElementById('diagnosis'),
+      workbench: document.getElementById('workbench'),
+      review: document.getElementById('review')
+    };
+    const stepperSteps = document.querySelectorAll('.stepper-step');
+
+    const variantData = {
+      A03: {
+        type: '钩子',
+        control: { hook: '熬夜脸急救', ctr: '1.13%', tag: '原版', sellingPoints: ['熬夜后暗沉修护', '肤色不均改善', '温和肤感体验'], cta: '查看修护方案' },
+        variants: [
+          { id: 'B01', name: '场景钩子', hook: '明早有会，今晚的脸别先投降', tag: '场景钩子', sellingPoints: ['场景化通勤修护', '肤色不均改善', '温和肤感体验'], cta: '查看修护方案' },
+          { id: 'B02', name: '问题钩子', hook: '暗沉不一定只是没睡够，也可能是肌肤状态在提醒', tag: '问题钩子', sellingPoints: ['问题引导式修护', '肤色不均改善', '温和肤感体验'], cta: '了解成分思路' },
+          { id: 'B03', name: '体验钩子', hook: '把熬夜后的疲惫感，藏进护肤流程里', tag: '体验钩子', sellingPoints: ['体验式生活修护', '肤色不均改善', '温和肤感体验'], cta: '保存护肤清单' }
+        ]
+      },
+      A02: {
+        type: '钩子',
+        control: { hook: '熬夜急救', ctr: '1.35%', tag: '原版', sellingPoints: ['熬夜后急救修护', '快速提亮肤色', '急救面膜体验'], cta: '立即急救' },
+        variants: [
+          { id: 'B01', name: '场景钩子', hook: '凌晨2点还在刷手机？你的脸在等你', tag: '场景钩子', sellingPoints: ['深夜场景共鸣', '快速提亮肤色', '急救面膜体验'], cta: '立即急救' },
+          { id: 'B02', name: '问题钩子', hook: '为什么熬夜后脸总是蜡黄？', tag: '问题钩子', sellingPoints: ['问题引导式修护', '快速提亮肤色', '急救面膜体验'], cta: '了解原因' },
+          { id: 'B03', name: '体验钩子', hook: '给熬夜的脸，一个急救的拥抱', tag: '体验钩子', sellingPoints: ['情感化体验', '快速提亮肤色', '急救面膜体验'], cta: '体验急救' }
+        ]
+      },
+      A05: {
+        type: '视觉',
+        control: { hook: '急救面膜', ctr: '1.42%', tag: '原版', sellingPoints: ['急救修护', '深层补水', '舒缓敏感'], cta: '查看面膜', visualStyle: '产品特写', imageUrl: 'images/a05-control.png' },
+        // 单变量实验：B01/B02/B03 钩子/卖点/CTA 与对照组完全一致，仅替换封面图（视觉构图）
+        variants: [
+          { id: 'B01', name: '清新风', hook: '急救面膜', tag: '清新风', sellingPoints: ['急救修护', '深层补水', '舒缓敏感'], cta: '查看面膜', visualStyle: '清新自然', imageUrl: 'images/a05-b01-fresh.png' },
+          { id: 'B02', name: '高级风', hook: '急救面膜', tag: '高级风', sellingPoints: ['急救修护', '深层补水', '舒缓敏感'], cta: '查看面膜', visualStyle: '高端奢华', imageUrl: 'images/a05-b02-luxury.png' },
+          { id: 'B03', name: '生活风', hook: '急救面膜', tag: '生活风', sellingPoints: ['急救修护', '深层补水', '舒缓敏感'], cta: '查看面膜', visualStyle: '日常场景', imageUrl: 'images/a05-b03-lifestyle.png' }
+        ]
+      },
+      A09: {
+        type: '钩子',
+        control: { hook: '急救精华', ctr: '1.55%', tag: '原版', sellingPoints: ['精华急救', '密集修护', '焕亮肤色'], cta: '查看精华' },
+        variants: [
+          { id: 'B01', name: '场景钩子', hook: '约会前3小时，脸突然暗沉？', tag: '场景钩子', sellingPoints: ['约会前急救', '密集修护', '焕亮肤色'], cta: '查看精华' },
+          { id: 'B02', name: '问题钩子', hook: '为什么精华用了却没效果？', tag: '问题钩子', sellingPoints: ['问题引导式修护', '密集修护', '焕亮肤色'], cta: '了解原因' },
+          { id: 'B03', name: '体验钩子', hook: '一滴精华，一夜回春', tag: '体验钩子', sellingPoints: ['极致体验', '密集修护', '焕亮肤色'], cta: '体验回春' }
+        ]
+      },
+      A04: {
+        type: '卖点',
+        control: { hook: '成分党', ctr: '1.05%', tag: '原版', sellingPoints: ['烟酰胺+玻尿酸', '7天提亮', '温和配方'], cta: '了解成分', structure: '成分→功效→证明' },
+        // 单变量实验：B01/B02/B03 钩子与 CTA 与对照组一致，仅卖点排序（卖点层级）发生变化
+        variants: [
+          { id: 'B01', name: '功效优先', hook: '成分党', tag: '功效优先', sellingPoints: ['7天提亮', '烟酰胺+玻尿酸', '温和配方'], cta: '了解成分', structure: '功效→成分→证明' },
+          { id: 'B02', name: '成分优先', hook: '成分党', tag: '成分优先', sellingPoints: ['烟酰胺+玻尿酸', '7天提亮', '温和配方'], cta: '了解成分', structure: '成分→功效→证明' },
+          { id: 'B03', name: '场景优先', hook: '成分党', tag: '场景优先', sellingPoints: ['熬夜后修护', '烟酰胺+玻尿酸', '7天提亮'], cta: '了解成分', structure: '场景→功效→成分' }
+        ]
+      }
+    };
+
+    let selectedVariant = 'B01';
+
+    function selectVariant(variantId) {
+      selectedVariant = variantId;
+      document.querySelectorAll('.variant-row[data-variant]').forEach(row => {
+        row.classList.toggle('selected', row.dataset.variant === variantId);
+      });
+      renderPhonePreview(variantId);
+    }
+
+    function renderVariables() {
+      if (!selectedMaterial) return;
+      const d = materialDiagnosis[selectedMaterial];
+      const variableList = document.getElementById('variableList');
+      if (!variableList) return;
+
+      variableList.querySelectorAll('.variable-item').forEach(item => {
+        const isActive = item.dataset.variable === d.variable;
+        item.classList.toggle('active', isActive);
+        const titleEl = item.querySelector('div:first-child');
+        if (titleEl) {
+          titleEl.classList.add('variable-item-title');
+          titleEl.textContent = titleEl.textContent.replace(/^✓ /, '');
+        }
+      });
+    }
+
+    function renderPhonePreview(variantId) {
+      if (!selectedMaterial || !variantData[selectedMaterial]) return;
+      const materialVariants = variantData[selectedMaterial];
+      const type = materialVariants.type;
+      let v;
+      if (variantId === 'control') {
+        v = materialVariants.control;
+      } else {
+        v = materialVariants.variants.find(v => v.id === variantId);
+      }
+      if (!v) return;
+
+      let coverHtml;
+      if (type === '视觉' && v.imageUrl) {
+        // 视觉类型：显示本地封面图（每个变体一张）
+        coverHtml = `
+          <div class="phone-cover" style="padding: 0; overflow: hidden;">
+            <img src="${v.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" alt="${v.name}">
+          </div>
+        `;
+      } else if (type === '卖点' && v.structure) {
+        // 卖点类型：显示卖点结构图 + 文案
+        const structureSteps = v.structure.split('→');
+        coverHtml = `
+          <div class="phone-cover" style="flex-direction: column; gap: 8px;">
+            <div class="phone-cover-text" style="font-size: 16px; margin-bottom: 8px;">${v.hook}</div>
+            <div style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: var(--text-secondary);">
+              ${structureSteps.map((step, i) => `
+                <span style="padding: 2px 8px; background: rgba(0,102,255,0.1); border-radius: 10px; color: var(--primary); font-weight: 600;">${step}</span>
+                ${i < structureSteps.length - 1 ? '<span>→</span>' : ''}
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else if (variantId === 'control' && materialCovers[selectedMaterial]) {
+        // 非视觉类型的对照组：显示素材原图 + 标题叠层
+        coverHtml = `
+          <div class="phone-cover" style="padding: 0; overflow: hidden; position: relative;">
+            <img src="${materialCovers[selectedMaterial]}" style="width: 100%; height: 100%; object-fit: cover;" alt="${v.hook}">
+            <div style="position: absolute; bottom: 0; left: 0; right: 0; padding: 12px; background: linear-gradient(transparent, rgba(0,0,0,0.7)); color: white; font-size: 14px; font-weight: 600;">${v.hook}</div>
+          </div>
+        `;
+      } else {
+        // 钩子类型变体：显示素材封面图为背景 + 新钩子文案叠层（强调"只改了钩子，图未变"）
+        const bgUrl = materialCovers[selectedMaterial];
+        if (bgUrl) {
+          coverHtml = `
+            <div class="phone-cover" style="padding: 0; overflow: hidden; position: relative;">
+              <img src="${bgUrl}" style="width: 100%; height: 100%; object-fit: cover; filter: brightness(0.85);" alt="${v.hook}">
+              <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.6) 100%);">
+                <div class="phone-cover-text" style="color: white; text-shadow: 0 2px 8px rgba(0,0,0,0.5);">${v.hook}</div>
+              </div>
+            </div>
+          `;
+        } else {
+          coverHtml = `
+            <div class="phone-cover">
+              <div class="phone-cover-text">${v.hook}</div>
+            </div>
+          `;
+        }
+      }
+
+      document.getElementById('phonePreview').innerHTML = `
+        ${coverHtml}
+        <div class="phone-body">
+          ${v.sellingPoints.map(sp => `<div class="phone-selling-point"><span style="color: var(--primary);">✦</span> ${sp}</div>`).join('')}
+        </div>
+        <div class="phone-cta">${v.cta}</div>
+      `;
+    }
+
+    function closeComplianceModal() {
+      document.getElementById('complianceModal').classList.remove('active');
+    }
+
+    function renderVariantList() {
+      if (!selectedMaterial || !variantData[selectedMaterial]) return;
+      const container = document.getElementById('variantListContainer');
+      if (!container) return;
+
+      const materialVariants = variantData[selectedMaterial];
+      const d = materialDiagnosis[selectedMaterial];
+      const type = materialVariants.type;
+
+      let html = `
+        <div class="variant-row control">
+          <span class="row-id">${selectedMaterial} · 对照组</span>
+          <span class="row-title">${type === '视觉' ? `${materialVariants.control.hook}（${materialVariants.control.visualStyle || '原图'}）` : materialVariants.control.hook}</span>
+          <span class="row-ctr" style="color: var(--text-tertiary);">当前CTR ${materialVariants.control.ctr}</span>
+        </div>
+      `;
+
+      materialVariants.variants.forEach((v, i) => {
+        if (type === '视觉') {
+          // 视觉类型：单变量实验——文案与对照组一致，仅展示视觉风格差异
+          html += `
+            <div class="variant-row ${i === 0 ? 'selected' : ''}" data-variant="${v.id}" onclick="selectVariant('${v.id}')">
+              <span class="row-id">${v.id} · ${v.name}</span>
+              <span class="row-title">${v.hook}（仅替换封面图）</span>
+              <span class="row-ctr" style="color: var(--text-tertiary);">${v.visualStyle || '视觉变体'}</span>
+            </div>
+          `;
+        } else if (type === '卖点') {
+          // 卖点类型：单变量实验——文案与对照组一致，仅展示卖点结构差异
+          html += `
+            <div class="variant-row ${i === 0 ? 'selected' : ''}" data-variant="${v.id}" onclick="selectVariant('${v.id}')">
+              <span class="row-id">${v.id} · ${v.name}</span>
+              <span class="row-title">${v.hook}（仅调整卖点排序）</span>
+              <span class="row-ctr" style="color: var(--text-tertiary);">${v.structure || '结构变体'}</span>
+            </div>
+          `;
+        } else {
+          // 钩子类型：显示文案变体
+          html += `
+            <div class="variant-row ${i === 0 ? 'selected' : ''}" data-variant="${v.id}" onclick="selectVariant('${v.id}')">
+              <span class="row-id">${v.id} · ${v.name}</span>
+              <span class="row-title">${v.hook}</span>
+              <span class="row-ctr" style="color: var(--text-tertiary);">待实验验证</span>
+            </div>
+          `;
+        }
+      });
+
+      container.innerHTML = html;
+      selectedVariant = materialVariants.variants[0].id;
+      renderPhonePreview(selectedVariant);
+    }
+
+    /* ---------- 模块切换 ---------- */
+    function switchModule(moduleId) {
+      Object.values(modules).forEach(m => m.classList.remove('active'));
+      modules[moduleId].classList.add('active');
+
+      const order = ['diagnosis', 'workbench', 'review'];
+      const currentIndex = order.indexOf(moduleId);
+
+      stepperSteps.forEach((step, i) => {
+        step.classList.remove('completed', 'current', 'upcoming');
+        if (i < currentIndex) step.classList.add('completed');
+        else if (i === currentIndex) step.classList.add('current');
+        else step.classList.add('upcoming');
+        step.querySelector('.stepper-node').textContent = i < currentIndex ? '✓' : (i + 1);
+      });
+
+      const line1 = document.getElementById('line1');
+      const line2 = document.getElementById('line2');
+      line1.classList.toggle('completed', currentIndex >= 1);
+      line2.classList.toggle('completed', currentIndex >= 2);
+
+      if (moduleId === 'workbench' && selectedMaterial) {
+        const d = materialDiagnosis[selectedMaterial];
+
+        // F-4 守卫：不满足续命条件（如健康/低疲劳）或缺少变体数据的素材，不应进入工作台
+        if (!d.canRenew || !variantData[selectedMaterial]) {
+          renderWorkbenchEmpty(d);
+          return;
+        }
+
+        document.getElementById('workbenchDesc').innerHTML =
+          `当前续命对象：<strong>${selectedMaterial} · ${d.name}</strong>，主变量为 ${d.variableName}`;
+        document.getElementById('workbenchVariableHeader').innerHTML =
+          `<h2 class="card-title">实验变量</h2><span class="card-badge badge-primary">${selectedMaterial}</span>`;
+        renderVariables();
+        renderVariantList();
+        renderComplianceCard();      // H-6: 合规预审卡片按素材动态渲染
+        renderExperimentMetaInputs(); // M-1/M-8: 实验设置中"核心指标"/"3个方案"等动态化
+
+        // F-2/M-3: 根据当前素材的实验状态决定显示哪个区域，而非强制重置
+        const state = getExperimentState(selectedMaterial);
+        if (state.status === 'running') {
+          showRunningArea(selectedMaterial, state);
+        } else {
+          document.getElementById('experimentActionArea').style.display = 'flex';
+          document.getElementById('experimentRunningArea').style.display = 'none';
+        }
+      }
+
+      if (moduleId === 'review') {
+        renderReview();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ---------- 进度环 SVG 生成 ---------- */
+    function renderProgressRing(fatigue) {
+      const circumference = 2 * Math.PI * 50; // r=50
+      const offset = circumference - (fatigue / 100) * circumference;
+      const color = fatigue >= 80 ? '#FF3B30' : fatigue >= 60 ? '#FF9500' : '#34C759';
+      return `
+        <svg width="120" height="120" style="transform: rotate(-90deg);">
+          <circle cx="60" cy="60" r="50" fill="none" stroke="#E5E5EA" stroke-width="10"/>
+          <circle cx="60" cy="60" r="50" fill="none" stroke="${color}" stroke-width="10"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}"
+            style="transition: stroke-dashoffset 0.6s ease, stroke 0.6s ease;"/>
+        </svg>
+        <div class="progress-text">
+          <div class="progress-value" style="color: ${color}; transition: color 0.6s ease;">${fatigue}</div>
+          <div class="progress-label">疲劳指数</div>
+        </div>`;
+    }
+
+    /* ---------- 渲染诊断数据 ---------- */
+    function renderDiagnosis(materialId) {
+      selectedMaterial = materialId;
+      const d = materialDiagnosis[materialId];
+
+      // 更新模块描述
+      document.getElementById('diagnosisSelected').innerHTML =
+        `当前选中：<strong>${materialId} · ${d.name}</strong> — 点击左侧素材切换查看`;
+
+      // 顶部指标卡 2: CTR
+      document.getElementById('statCtr').textContent = `-${d.ctr.decline}%`;
+      document.getElementById('statCtrDetail').textContent = `${d.ctr.from}% → ${d.ctr.to}%`;
+      document.getElementById('statCtrTrend').className =
+        `stat-trend ${d.ctr.decline > 10 ? 'trend-down' : 'trend-down'}`;
+
+      // 顶部指标卡 3: 疲劳指数
+      const statFatigue = document.getElementById('statFatigue');
+      statFatigue.textContent = d.fatigue;
+      statFatigue.style.color = d.fatigue >= 80 ? 'var(--danger)' : d.fatigue >= 60 ? 'var(--warning)' : 'var(--success)';
+      document.getElementById('statFatigueLevel').textContent =
+        d.level === 'high' ? '高风险' : d.level === 'medium' ? '中风险' : '健康';
+      document.getElementById('statFatigueTrend').className =
+        `stat-trend ${d.level === 'healthy' ? 'trend-up' : 'trend-down'}`;
+
+      // 顶部指标卡 4: 推荐主变量
+      document.getElementById('statVariable').textContent = d.variable;
+      document.getElementById('statImprove').textContent = d.improve === '—' ? '—' : `预计提升 ${d.improve}`;
+      document.getElementById('statImproveTrend').className =
+        `stat-trend ${d.canRenew ? 'trend-up' : 'trend-down'}`;
+
+      // AI 分析标题
+      document.getElementById('analysisTitle').textContent = `AI归因分析 · ${materialId}`;
+
+      // 进度环
+      document.getElementById('progressRing').innerHTML = renderProgressRing(d.fatigue);
+
+      // 时间线
+      document.getElementById('diagnosisTimeline').innerHTML = d.timeline.map(item => `
+        <div class="timeline-item">
+          <div class="timeline-dot"></div>
+          <div class="timeline-title">${item.title}</div>
+          <div class="timeline-desc">${item.desc}</div>
+        </div>
+      `).join('');
+
+      // 推荐区域
+      document.getElementById('diagnosisRecommendation').innerHTML = d.canRenew
+        ? `
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <div>
+              <div style="font-weight: 600; font-size: 14px;">推荐主变量</div>
+              <div style="font-size: 13px; color: var(--text-secondary);">${d.recommendation}</div>
+            </div>
+            <span class="badge-primary" style="padding: 8px 16px; font-size: 14px;">${d.variableName}</span>
+          </div>
+          <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchModule('workbench')">
+            ⚡ 为 ${materialId} 一键续命 →
+          </button>
+          <div style="margin-top: 8px; text-align: center; font-size: 12px; color: var(--text-tertiary);">AI自动推荐变量 + 生成变体 + 合规预审</div>`
+        : `
+          <div style="padding: 16px; background: var(--background); border-radius: var(--radius-sm); border-left: 4px solid var(--warning); margin-bottom: 16px;">
+            <div style="font-weight: 600; font-size: 14px; margin-bottom: 8px;">${d.level === 'healthy' ? '素材健康，无需干预' : '暂不满足续命条件'}</div>
+            <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 12px;">${d.recommendation}</div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: var(--text-tertiary);">
+              <span>疲劳指数 ${d.fatigue}${d.fatigue < 80 ? '，未达高疲劳阈值 80' : ''}</span>
+              <span>CTR ${d.ctr.from}% → ${d.ctr.to}%</span>
+              <span>收藏率 ${d.saveRate.from}% → ${d.saveRate.to}%</span>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <span class="badge-warning" style="padding: 8px 16px; font-size: 14px; width: 100%; text-align: center;">
+              ${d.level === 'healthy' ? '✓ 继续常规投放' : '⏳ 继续观察，等待疲劳分达阈值'}
+            </span>
+          </div>`;
+    }
+
+    /* ---------- 筛选器逻辑 ---------- */
+    function applyFilters() {
+      const campaign = document.getElementById('filterCampaign').value;
+      const format = document.getElementById('filterFormat').value;
+      const stage = document.getElementById('filterStage').value;
+      const timeWindow = document.getElementById('filterWindow').value;
+      const view = document.getElementById('filterView').value;
+
+      // 同步到全局 Store，驱动所有面板联动刷新
+      filterState.campaign = campaign;
+      filterState.format = format;
+      filterState.stage = stage;
+      filterState.window = timeWindow;
+      filterState.view = view;
+      refreshAllByFilter();
+    }
+
+    /* ---------- 素材列表动态渲染 ---------- */
+    let currentView = 'high';
+    let displayedCount = 4;
+
+    function getSortedMaterials() {
+      return Object.entries(materialDiagnosis)
+        .sort((a, b) => b[1].fatigue - a[1].fatigue);
+    }
+
+    function filterMaterials(view) {
+      const all = getSortedMaterials();
+      if (view === 'high') return all.filter(([_, d]) => d.fatigue >= 80);
+      if (view === 'medium') return all.filter(([_, d]) => d.fatigue >= 60);
+      return all;
+    }
+
+    function renderMaterialList() {
+      const materials = filterMaterials(currentView);
+      const container = document.getElementById('materialList');
+      const showCount = Math.min(displayedCount, materials.length);
+
+      container.innerHTML = materials.slice(0, showCount).map(([id, d]) => {
+        // 优先使用真实封面图，回落到 emoji
+        const cover = materialCovers[id];
+        const previewHtml = cover
+          ? `<div class="material-preview" style="padding: 0; overflow: hidden;"><img src="${cover}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" alt="${d.name}"></div>`
+          : `<div class="material-preview">${d.fatigue >= 80 ? '🌟' : d.fatigue >= 60 ? '📊' : '💼'}</div>`;
+        return `
+        <div class="material-item ${id === selectedMaterial ? 'selected' : ''}" data-id="${id}" onclick="selectMaterial('${id}')">
+          ${previewHtml}
+          <div class="material-info">
+            <div class="material-name">${id} · ${d.name}</div>
+            <div class="material-metrics">
+              <span>CTR: ${d.ctr.to}% ${d.ctr.decline > 0 ? '↓' : '→'}</span>
+              <span>疲劳指数: ${d.fatigue}</span>
+              <span class="badge-${d.level === 'high' ? 'danger' : d.level === 'medium' ? 'warning' : 'success'}" style="padding: 2px 8px; border-radius: 10px; font-size: 11px;">
+                ${d.level === 'high' ? '高疲劳' : d.level === 'medium' ? '中疲劳' : '健康'}
+              </span>
+            </div>
+          </div>
+          ${d.canRenew ? `<button class="quick-renew-btn" onclick="event.stopPropagation(); switchModule('workbench')">⚡ 一键续命</button>` : ''}
+        </div>
+      `}).join('');
+
+      // 更新加载更多按钮
+      const loadMoreContainer = document.getElementById('loadMoreContainer');
+      if (materials.length > showCount) {
+        loadMoreContainer.style.display = 'block';
+      } else {
+        loadMoreContainer.style.display = 'none';
+      }
+
+      // 更新筛选结果数量
+      renderFilterResultBadge();
+    }
+
+    /* ---------- Change 3: 动态渲染顶部4张统计卡 ---------- */
+    function renderStats() {
+      const all = Object.entries(materialDiagnosis);
+      // 按当前 filter 模拟筛选
+      let filtered = all;
+      if (filterState.campaign !== 'all') filtered = all.slice(0, Math.ceil(all.length * 0.67));
+      if (filterState.stage === 'decline') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.5));
+      if (filterState.view === 'high') filtered = filtered.filter(([_, d]) => d.fatigue >= 80);
+      else if (filterState.view === 'medium') filtered = filtered.filter(([_, d]) => d.fatigue >= 60);
+
+      const highCount = filtered.filter(([_, d]) => d.fatigue >= 80).length;
+      const totalCount = filtered.length;
+      const avgFatigue = totalCount > 0
+        ? Math.round(filtered.reduce((s, [_, d]) => s + d.fatigue, 0) / totalCount)
+        : 0;
+      const avgCtrDecline = totalCount > 0
+        ? (filtered.reduce((s, [_, d]) => s + d.ctr.decline, 0) / totalCount).toFixed(1)
+        : 0;
+
+      // 计算最常见的主变量类型
+      const typeCounts = {};
+      filtered.forEach(([id, d]) => {
+        const v = variantData[id];
+        if (v) typeCounts[v.type] = (typeCounts[v.type] || 0) + 1;
+      });
+      const mostType = Object.entries(typeCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || '钩子';
+      const typeToName = { '钩子': '钩子表达', '视觉': '视觉构图', '卖点': '卖点层级', '合规': '合规合规' };
+      const bestImprove = { '钩子': '+42.0%', '视觉': '+39.8%', '卖点': '+37.5%', '合规': '+31.0%' };
+
+      // Card 0: 高疲劳素材数
+      const stat0 = document.querySelector('.stat-card:nth-child(1)');
+      if (stat0) {
+        stat0.querySelector('.stat-value').textContent = `${highCount}/${totalCount}`;
+        stat0.querySelector('.stat-label').textContent = '全部高疲劳素材';
+        stat0.querySelector('.stat-trend span').textContent = '全局数据，不受选中影响';
+      }
+
+      // Card 1: CTR下滑
+      const stat1 = document.querySelector('.stat-card:nth-child(2)');
+      if (stat1) {
+        stat1.querySelector('.stat-value').textContent = `-${avgCtrDecline}%`;
+        stat1.querySelector('.stat-label').textContent = 'CTR下滑幅度';
+        stat1.querySelector('.stat-trend span').textContent = `平均降幅 ${avgCtrDecline}%`;
+      }
+
+      // Card 2: 疲劳指数
+      const stat2 = document.querySelector('.stat-card:nth-child(3)');
+      if (stat2) {
+        stat2.querySelector('.stat-value').textContent = avgFatigue;
+        stat2.querySelector('.stat-label').textContent = '疲劳指数';
+        const badge = stat2.querySelector('.stat-trend span');
+        badge.textContent = avgFatigue >= 80 ? '高风险' : avgFatigue >= 60 ? '中风险' : '健康';
+        badge.style.color = avgFatigue >= 80 ? 'var(--danger)' : avgFatigue >= 60 ? 'var(--warning)' : 'var(--success)';
+      }
+
+      // Card 3: 推荐主变量
+      const stat3 = document.querySelector('.stat-card:nth-child(4)');
+      if (stat3) {
+        stat3.querySelector('.stat-value').textContent = typeToName[mostType] || '钩子表达';
+        stat3.querySelector('.stat-label').textContent = '推荐主变量';
+        stat3.querySelector('.stat-trend span').textContent = `预计提升 ${bestImprove[mostType] || '+42.0%'}`;
+      }
+    }
+
+    function renderFilterResultBadge() {
+      const all = Object.entries(materialDiagnosis);
+      let filtered = all;
+      if (filterState.campaign !== 'all') filtered = all.slice(0, Math.ceil(all.length * 0.67));
+      if (filterState.stage === 'decline') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.5));
+      if (filterState.view === 'high') filtered = filtered.filter(([_, d]) => d.fatigue >= 80);
+      else if (filterState.view === 'medium') filtered = filtered.filter(([_, d]) => d.fatigue >= 60);
+
+      const concern = filtered.filter(([_, d]) => d.fatigue >= 60).length;
+      document.getElementById('filterResult').textContent = `${filtered.length}条素材 · ${concern}条需关注`;
+    }
+
+    function selectMaterial(id) {
+      selectedMaterial = id;
+      document.querySelectorAll('.material-item').forEach(i => i.classList.remove('selected'));
+      const item = document.querySelector(`.material-item[data-id="${id}"]`);
+      if (item) item.classList.add('selected');
+      renderDiagnosis(id);
+    }
+
+    function setView(view) {
+      currentView = view;
+      displayedCount = 4;
+      document.querySelectorAll('.view-toggle').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.view === view);
+      });
+      renderMaterialList();
+    }
+
+    function loadMore() {
+      displayedCount += 4;
+      renderMaterialList();
+    }
+
+    /* ---------- 工作台空状态：素材不满足续命条件或缺少变体数据时显示 ---------- */
+    function renderWorkbenchEmpty(d) {
+      document.getElementById('workbenchDesc').innerHTML =
+        `当前选中：<strong>${selectedMaterial} · ${d.name}</strong>`;
+      document.getElementById('workbenchVariableHeader').innerHTML =
+        `<h2 class="card-title">实验变量</h2><span class="card-badge badge-warning">不可续命</span>`;
+      // 清空变体列表与手机预览
+      const variantList = document.getElementById('variantListContainer');
+      if (variantList) {
+        variantList.innerHTML = `
+          <div style="padding: 32px; text-align: center; background: var(--background); border-radius: var(--radius); color: var(--text-secondary);">
+            <div style="font-size: 32px; margin-bottom: 12px;">🚫</div>
+            <div style="font-weight: 600; font-size: 15px; margin-bottom: 6px;">${d.level === 'healthy' ? '素材表现健康，无需续命' : '当前素材暂不满足续命条件'}</div>
+            <div style="font-size: 13px; line-height: 1.6;">${d.recommendation || '请返回诊断页选择高疲劳素材。'}</div>
+            <button class="btn btn-primary" style="margin-top: 20px;" onclick="switchModule('diagnosis')">← 返回诊断页</button>
+          </div>
+        `;
+      }
+      const phonePreview = document.getElementById('phonePreview');
+      if (phonePreview) phonePreview.innerHTML = '';
+      // 隐藏提交区域
+      document.getElementById('experimentActionArea').style.display = 'none';
+      document.getElementById('experimentRunningArea').style.display = 'none';
+    }
+
+    /* ---------- 实验运行中 / 已完成 提示区 ---------- */
+    function showRunningArea(materialId, state) {
+      const d = materialDiagnosis[materialId];
+      const area = document.getElementById('experimentRunningArea');
+      document.getElementById('experimentActionArea').style.display = 'none';
+      area.style.display = 'block';
+      const isCompleted = state.status === 'completed';
+      // 根据状态切换视觉、文案、按钮
+      area.style.background = isCompleted ? 'var(--success-soft)' : 'var(--primary-soft)';
+      area.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <div style="width: 40px; height: 40px; border-radius: 50%; background: ${isCompleted ? 'var(--success)' : 'var(--primary)'}; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px;">${isCompleted ? '✓' : '⏳'}</div>
+          <div style="flex: 1;">
+            <div style="font-weight: 600; font-size: 16px;">${isCompleted ? '实验已完成 · 72小时数据已出' : '实验进行中'}</div>
+            <div style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+              <span>${materialId} · ${d.variableName}实验 · 72小时窗口</span>
+            </div>
+            <div style="font-size: 12px; color: var(--text-tertiary); margin-top: 4px;">${isCompleted ? '点击右侧按钮查看实验复盘与放量决策' : '实验完成后将自动通知您查看复盘结果'}</div>
+          </div>
+          ${isCompleted
+            ? `<button class="btn btn-primary" onclick="goReview('${materialId}')">📊 查看复盘 →</button>`
+            : `<button class="btn btn-secondary" onclick="switchModule('diagnosis')">返回诊断其他素材</button>`}
+        </div>
+      `;
+    }
+
+    /* ---------- 跳转到复盘看板（确保当前选中是该素材） ---------- */
+    function goReview(materialId) {
+      selectedMaterial = materialId;
+      switchModule('review');
+      hideExpToast();
+    }
+
+    /* ---------- 实验完成 Toast ---------- */
+    let expToastTimer = null;
+    let expToastTargetMaterial = null;
+    function showExpToast(materialId) {
+      const d = materialDiagnosis[materialId];
+      expToastTargetMaterial = materialId;
+      // 精简文案，避免顶部横条过宽影响阅读
+      document.getElementById('expToastTitle').textContent =
+        `${materialId} · ${d.name} 实验已完成`;
+      document.getElementById('expToastSub').textContent =
+        `${d.variableName} · 72小时数据已出`;
+      const toast = document.getElementById('expToast');
+      toast.classList.add('show');
+      // 12 秒后自动隐藏，给用户充分时间点击
+      if (expToastTimer) clearTimeout(expToastTimer);
+      expToastTimer = setTimeout(hideExpToast, 12000);
+    }
+    function hideExpToast() {
+      document.getElementById('expToast').classList.remove('show');
+      if (expToastTimer) { clearTimeout(expToastTimer); expToastTimer = null; }
+    }
+    function onExpToastClick() {
+      if (expToastTargetMaterial) {
+        goReview(expToastTargetMaterial);
+      }
+    }
+
+    /* ---------- M-1/M-8: 根据主变量类型动态设置"核心指标"输入框与"3个方案"角标 ---------- */
+    function renderExperimentMetaInputs() {
+      const mv = variantData[selectedMaterial];
+      if (!mv) return;
+      const metricLabel = document.getElementById('expMetricLabel');
+      if (metricLabel) {
+        const typeToMetric = { '视觉': '视觉点击率', '卖点': '信息理解度', '钩子': 'CTR提升率', '合规': '合规通过率' };
+        metricLabel.textContent = typeToMetric[mv.type] || 'CTR提升率';
+      }
+      const variantCountBadge = document.getElementById('variantCountBadge');
+      if (variantCountBadge) variantCountBadge.textContent = `${mv.variants.length}个方案`;
+    }
+
+    /* ---------- H-6: 合规预审卡片按当前素材的变体动态生成 ---------- */
+    function renderComplianceCard() {
+      const mv = variantData[selectedMaterial];
+      if (!mv) return;
+      const card = document.getElementById('complianceCard');
+      if (!card) return;
+      // 简单模拟：第二个变体标记"已改写"，其他通过
+      const badges = mv.variants.map((v, i) => {
+        if (i === 1) return `<span class="badge-warning" style="padding: 6px 12px;">${v.id} 已改写</span>`;
+        return `<span class="badge-success" style="padding: 6px 12px;">${v.id} 通过</span>`;
+      }).join('');
+      card.innerHTML = `
+        <div class="card-header">
+          <h2 class="card-title">合规预审</h2>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 48px; margin-bottom: 12px;">✅</div>
+          <div style="font-weight: 700; font-size: 16px; margin-bottom: 4px;">全部通过</div>
+          <div style="font-size: 13px; color: var(--text-secondary);">已完成自动改写，可直接投放</div>
+          <div style="margin-top: 16px; display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">${badges}</div>
+          <div style="margin-top: 12px; font-size: 12px; color: var(--primary); font-weight: 600;">点击查看审计详情 →</div>
+        </div>
+      `;
+    }
+
+    /* ---------- H-5: 合规弹窗内容按素材变体动态生成 ---------- */
+    function openComplianceModal() {
+      const mv = variantData[selectedMaterial];
+      const modal = document.getElementById('complianceModal');
+      const body = document.getElementById('complianceModalBody');
+      if (mv && body) {
+        body.innerHTML = mv.variants.map((v, i) => {
+          if (i === 1) {
+            return `
+              <div class="audit-item" style="border-left: 3px solid var(--warning);">
+                <div class="audit-variant-id">${v.id} · ${v.name}</div>
+                <div class="audit-row"><span class="audit-label">风险等级</span><span class="audit-value" style="color: var(--warning);">⚠️ 表达偏强，已自动改写</span></div>
+                <div class="audit-row"><span class="audit-label">${mv.type === '视觉' ? '视觉风格' : '文案'}</span><span class="audit-value">"${v.hook}"${v.visualStyle ? `（${v.visualStyle}）` : ''}</span></div>
+                <div class="audit-rewrite"><div style="font-weight: 600; margin-bottom: 4px;">自动改写</div><div style="color: var(--text-secondary);">已替换为低风险表达后入候选池</div></div>
+              </div>
+            `;
+          }
+          return `
+            <div class="audit-item">
+              <div class="audit-variant-id">${v.id} · ${v.name}</div>
+              <div class="audit-row"><span class="audit-label">风险等级</span><span class="audit-value" style="color: var(--success);">✅ 无明显风险</span></div>
+              <div class="audit-row"><span class="audit-label">${mv.type === '视觉' ? '视觉风格' : '文案'}</span><span class="audit-value">"${v.hook}"${v.visualStyle ? `（${v.visualStyle}）` : ''}</span></div>
+              <div class="audit-row"><span class="audit-label">处理</span><span class="audit-value">进入候选池</span></div>
+            </div>
+          `;
+        }).join('');
+      }
+      modal.classList.add('active');
+    }
+
+    function submitExperiment() {
+      // H-7: 防重复提交守卫
+      const currentState = getExperimentState(selectedMaterial);
+      if (currentState.status === 'running') {
+        return; // 已有进行中实验，忽略重复点击
+      }
+      if (!selectedMaterial || !selectedVariant) return;
+      if (!variantData[selectedMaterial]) return;
+
+      // F-3: 闭包捕获 materialId / variantId / variableName，避免与全局 selectedMaterial 漂移
+      const materialId = selectedMaterial;
+      const variantId = selectedVariant;
+      const d = materialDiagnosis[materialId];
+      const state = {
+        status: 'running',
+        variantId,
+        startTime: new Date().toISOString(),
+        completedAt: null
+      };
+      setExperimentState(materialId, state);
+
+      // 仅当当前仍在该素材的工作台时才更新 UI
+      if (selectedMaterial === materialId) {
+        showRunningArea(materialId, state);
+      }
+
+      // 模拟实验完成（实际产品中这里是异步通知）
+      setTimeout(() => {
+        const finalState = { ...state, status: 'completed', completedAt: new Date().toISOString() };
+        setExperimentState(materialId, finalState);
+        // 只有当前还停留在该素材的工作台或诊断页时才弹 toast；其他场景静默更新状态
+        if (selectedMaterial === materialId &&
+            (modules.workbench.classList.contains('active') || modules.diagnosis.classList.contains('active'))) {
+          showRunningArea(materialId, finalState);
+          showExpToast(materialId);
+        }
+      }, 3000);
+    }
+
+    function renderReview() {
+      if (!selectedMaterial || !variantData[selectedMaterial]) return;
+      const container = document.getElementById('reviewContent');
+      if (!container) return;
+
+      const d = materialDiagnosis[selectedMaterial];
+      const materialVariants = variantData[selectedMaterial];
+      const control = materialVariants.control;
+      const variants = materialVariants.variants;
+
+      // H-4 修复：顶部横幅根据当前选中素材的实际实验状态动态填充
+      const expState = getExperimentState(selectedMaterial);
+      const bannerSub = document.getElementById('reviewBannerSub');
+      const bannerTitle = document.getElementById('reviewBannerTitle');
+      if (bannerSub) {
+        const completedAt = expState.completedAt
+          ? new Date(expState.completedAt).toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-')
+          : '—';
+        const expVariant = expState.variantId
+          ? variants.find(v => v.id === expState.variantId)
+          : null;
+        const variantLabel = expVariant ? `${expVariant.id} · ${expVariant.name}` : '推荐变体';
+        bannerSub.textContent = `${selectedMaterial} · ${d.name} · ${d.variableName}实验（${variantLabel}） · ${completedAt} 完成`;
+      }
+      if (bannerTitle) {
+        bannerTitle.textContent = expState.status === 'completed'
+          ? '实验已完成 · 72小时数据已出'
+          : '展示历史/模拟数据 · 当前素材尚未真实开跑实验';
+      }
+
+      // 模拟实验结果数据（实际应从后端获取）
+      // 根据主变量类型定义实验指标
+      const type = materialVariants.type;
+      const experimentResults = {
+        control: { 
+          ctr: control.ctr, 
+          saveRate: d.saveRate.to + '%',
+          visualClick: '2.1%',
+          infoUnderstand: '68%'
+        },
+        variants: variants.map((v, i) => {
+          const baseCtr = parseFloat(control.ctr);
+          const ctrMultiplier = [0.398, 0.274, 0.097][i];
+          return {
+            ...v,
+            ctr: (baseCtr * (1 + ctrMultiplier)).toFixed(2) + '%',
+            saveRate: (d.saveRate.to * (1 + [0.595, 0.452, 0.167][i])).toFixed(2) + '%',
+            visualClick: (2.1 * (1 + [0.45, 0.30, 0.12][i])).toFixed(1) + '%',
+            infoUnderstand: (68 * (1 + [0.25, 0.15, 0.05][i])).toFixed(0) + '%',
+            status: i === 0 ? '放量' : i === 1 ? '备选' : '观察',
+            statusClass: i === 0 ? 'badge-success' : i === 1 ? 'badge-primary' : 'badge-warning'
+          };
+        })
+      };
+
+      const bestVariant = experimentResults.variants[0];
+      const improvement = ((parseFloat(bestVariant.ctr) - parseFloat(control.ctr)) / parseFloat(control.ctr) * 100).toFixed(1);
+
+      container.innerHTML = `
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">实验结果对比</h2>
+            <span class="card-badge badge-primary">72小时实验数据</span>
+          </div>
+
+          <div class="chart-bar">
+            <div class="bar" style="height: 48%;">
+              <div class="bar-label">${selectedMaterial}</div>
+            </div>
+            <div class="bar active" style="height: 100%;">
+              <div class="bar-label">${variants[0].id}</div>
+            </div>
+            <div class="bar" style="height: 78%;">
+              <div class="bar-label">${variants[1].id}</div>
+            </div>
+            <div class="bar" style="height: 58%;">
+              <div class="bar-label">${variants[2].id}</div>
+            </div>
+          </div>
+
+          <table style="width: 100%; margin-top: 40px; border-collapse: collapse;">
+            <thead>
+              <tr style="border-bottom: 2px solid var(--border);">
+                <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">版本</th>
+                ${type === '视觉' ? `
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">视觉点击率</th>
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">CTR</th>
+                ` : type === '卖点' ? `
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">CTR</th>
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">信息理解度</th>
+                ` : `
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">CTR</th>
+                  <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">收藏率</th>
+                `}
+                <th style="text-align: left; padding: 12px 8px; font-size: 13px; color: var(--text-secondary);">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid var(--border);">
+                <td style="padding: 12px 8px; font-weight: 600;">${selectedMaterial} 对照组</td>
+                ${type === '视觉' ? `
+                  <td style="padding: 12px 8px;">${experimentResults.control.visualClick}</td>
+                  <td style="padding: 12px 8px;">${experimentResults.control.ctr}</td>
+                ` : type === '卖点' ? `
+                  <td style="padding: 12px 8px;">${experimentResults.control.ctr}</td>
+                  <td style="padding: 12px 8px;">${experimentResults.control.infoUnderstand}</td>
+                ` : `
+                  <td style="padding: 12px 8px;">${experimentResults.control.ctr}</td>
+                  <td style="padding: 12px 8px;">${experimentResults.control.saveRate}</td>
+                `}
+                <td style="padding: 12px 8px;"><span class="badge-warning" style="padding: 4px 10px;">基准</span></td>
+              </tr>
+              ${experimentResults.variants.map(v => `
+                <tr style="border-bottom: 1px solid var(--border);">
+                  <td style="padding: 12px 8px; font-weight: 600;">${v.id} ${v.name}</td>
+                  ${type === '视觉' ? `
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success); font-weight: 700;' : ''}">${v.visualClick}</td>
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success);' : ''}">${v.ctr}</td>
+                  ` : type === '卖点' ? `
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success); font-weight: 700;' : ''}">${v.ctr}</td>
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success);' : ''}">${v.infoUnderstand}</td>
+                  ` : `
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success); font-weight: 700;' : ''}">${v.ctr}</td>
+                    <td style="padding: 12px 8px; ${v.status === '放量' ? 'color: var(--success);' : ''}">${v.saveRate}</td>
+                  `}
+                  <td style="padding: 12px 8px;"><span class="${v.statusClass}" style="padding: 4px 10px;">${v.status}</span></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">双闭环输出</h2>
+            <span class="card-badge badge-success">已完成</span>
+          </div>
+
+          <div class="timeline">
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--success);"></div>
+              <div class="timeline-title">✓ 业务闭环 · 放量决策</div>
+              <div class="timeline-desc">${bestVariant.id}进入放量候选池，${selectedMaterial}停止作为主力素材</div>
+              <div style="margin-top: 6px;">
+                <span class="badge-success" style="padding: 4px 10px; font-size: 11px;">已自动更新放量候选池</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--primary);"></div>
+              <div class="timeline-title">✓ 学习闭环 · 已自动写回</div>
+              <div class="timeline-desc">
+                <div style="margin-top: 8px; padding: 12px; background: var(--background); border-radius: 8px;">
+                  <div style="font-weight: 600; font-size: 13px; margin-bottom: 4px;">新增经验</div>
+                  <div style="font-size: 13px; color: var(--text-secondary);">
+                    ${type === '视觉'
+                      ? `"${bestVariant.name}视觉风格（${bestVariant.visualStyle || '新构图'}）对目标人群点击吸引力更强，视觉点击率提升${((parseFloat(bestVariant.visualClick) - parseFloat(experimentResults.control.visualClick)) / parseFloat(experimentResults.control.visualClick) * 100).toFixed(0)}%（钩子/卖点不变，归因可靠）"`
+                      : type === '卖点'
+                      ? `"${bestVariant.name}卖点结构（${bestVariant.structure || '新排序'}）信息传递效率更高，用户理解度提升${((parseFloat(bestVariant.infoUnderstand) - parseFloat(experimentResults.control.infoUnderstand)) / parseFloat(experimentResults.control.infoUnderstand) * 100).toFixed(0)}%（钩子/CTA 不变，归因可靠）"`
+                      : `"${bestVariant.name}（如"${bestVariant.hook.substring(0, 15)}..."）对目标人群效果更佳，CTR提升${improvement}%"`
+                    }
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top: 6px;">
+                <span class="badge-primary" style="padding: 4px 10px; font-size: 11px;">已自动写入知识库</span>
+              </div>
+            </div>
+            <div class="timeline-item">
+              <div class="timeline-dot" style="background: var(--warning);"></div>
+              <div class="timeline-title">✓ 合规规则 · 自动记录</div>
+              <div class="timeline-desc">"${d.variableName}"相关表达已记录合规规则</div>
+              <div style="margin-top: 6px;">
+                <span class="badge-warning" style="padding: 4px 10px; font-size: 11px;">已自动写入合规规则库</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 24px; padding: 16px; background: var(--success-soft); border-radius: var(--radius-sm); display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 20px;">✓</span>
+            <span style="font-size: 14px; font-weight: 600; color: var(--success);">3项数据已自动写回：放量候选池 · 知识库 · 合规规则库</span>
+          </div>
+
+          <div style="margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border);">
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" onclick="switchModule('workbench')">← 上一步：智能续命</button>
+              <button class="btn btn-secondary" onclick="switchModule('diagnosis')">开始新诊断</button>
+              <button class="btn btn-primary btn-large" style="flex: 1;">
+                导出报告
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // 初始渲染：默认选中疲劳分最高的素材
+    const defaultMaterial = getSortedMaterials()[0][0];
+    selectedMaterial = defaultMaterial;
+
+    // Query 参数支持：通过 ?material=A02 指定选中素材
+    const urlParams = new URLSearchParams(location.search);
+    const queryMaterial = urlParams.get('material');
+    if (queryMaterial && materialDiagnosis[queryMaterial]) {
+      selectedMaterial = queryMaterial;
+    }
+
+    renderStats();
+    renderMaterialList();
+    renderDiagnosis(selectedMaterial);
+    renderFilterResultBadge();
+    renderPhonePreview('B01');
+
+    // Hash 路由支持：通过 URL hash 直接跳转指定模块
+    const hashModule = location.hash.replace('#', '');
+    if (hashModule && ['diagnosis', 'workbench', 'review'].includes(hashModule)) {
+      switchModule(hashModule);
+    }
+  </script>
+</body>
+</html>

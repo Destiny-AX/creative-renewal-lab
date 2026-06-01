@@ -11,3 +11,30 @@ __pycache__/
 *.pyc
 .next/
 coverage/
+
+# 排除所有非核心产品文件
+Kimi_期末路演资料包/
+browser-check/
+browser-check-final/
+prd-final-shots/
+.trae/
+*.ps1
+*.py
+*.md
+*.docx
+*.txt
+*.xml
+*.yml
+temp_*
+v4_full_content.md
+creative-fatigue-lab-prototype.html
+creative-renewal-apple-prototype.html
+creative-renewal-concept.html
+server.js
+append_to_doc.*
+SIM-GL-A03-v1.json
+
+# 排除根目录下的截图和图片
+/*.png
+apple-prototype-*.png
+screenshot-check.png
