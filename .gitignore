@@ -20,7 +20,8 @@ prd-final-shots/
 .trae/
 *.ps1
 *.py
-*.md
+/*.md
+!vercel-site/README.md
 *.docx
 *.txt
 *.xml

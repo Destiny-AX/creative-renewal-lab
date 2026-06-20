@@ -1391,7 +1391,14 @@
         <div class="card">
           <div class="card-header">
             <h2 class="card-title">素材列表</h2>
-            <div style="display: flex; gap: 8px;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+              <select id="industryFilter" onchange="updateIndustryFilter(this.value)" style="padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border); background: var(--background); color: var(--text-primary); font-size: 13px; cursor: pointer; outline: none;">
+                <option value="all">全部行业</option>
+                <option value="beauty">美妆护肤</option>
+                <option value="digital">3C数码</option>
+                <option value="food">食品饮料</option>
+                <option value="education">在线教育</option>
+              </select>
               <button class="view-toggle active" data-view="high" onclick="setView('high')">只看高疲劳</button>
               <button class="view-toggle" data-view="medium" onclick="setView('medium')">高+中</button>
               <button class="view-toggle" data-view="all" onclick="setView('all')">全部</button>
@@ -1624,12 +1631,23 @@
       A06: 'images/a06-cover.png',
       A07: 'images/a07-cover.png',
       A08: 'images/a08-cover.png',
-      A09: 'images/a09-cover.png'
+      A09: 'images/a09-cover.png',
+      D01: 'images/digital-placeholder.svg',
+      D02: 'images/digital-placeholder.svg',
+      F01: 'images/food-placeholder.svg',
+      F02: 'images/food-placeholder.svg',
+      F03: 'images/food-placeholder.svg',
+      E01: 'images/edu-placeholder.svg',
+      E02: 'images/edu-placeholder.svg',
+      E03: 'images/edu-placeholder.svg'
     };
 
     const materialDiagnosis = {
       A03: {
         name: '熬夜脸急救',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.82, to: 1.13, decline: 37.9 },
         saveRate: { from: 0.64, to: 0.42, decline: 34.4 },
         frequency: 3.8,
@@ -1649,6 +1667,9 @@
       },
       A06: {
         name: '成分科普',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.36, to: 1.28, decline: 5.9 },
         saveRate: { from: 0.71, to: 0.62, decline: 12.7 },
         frequency: 2.4,
@@ -1668,6 +1689,9 @@
       },
       A08: {
         name: '前后对比',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.49, to: 1.31, decline: 12.1 },
         saveRate: { from: 0.58, to: 0.50, decline: 13.8 },
         frequency: 2.9,
@@ -1687,6 +1711,9 @@
       },
       A01: {
         name: '早八通勤',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.51, to: 1.44, decline: 4.6 },
         saveRate: { from: 0.56, to: 0.53, decline: 5.4 },
         frequency: 2.1,
@@ -1706,6 +1733,9 @@
       },
       A02: {
         name: '熬夜急救',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 2.1, to: 1.35, decline: 35.7 },
         saveRate: { from: 0.68, to: 0.45, decline: 33.8 },
         frequency: 4.2,
@@ -1725,6 +1755,9 @@
       },
       A04: {
         name: '成分党',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.18, to: 1.05, decline: 11.0 },
         saveRate: { from: 0.72, to: 0.65, decline: 9.7 },
         frequency: 2.8,
@@ -1744,6 +1777,9 @@
       },
       A05: {
         name: '急救面膜',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.95, to: 1.42, decline: 27.2 },
         saveRate: { from: 0.61, to: 0.48, decline: 21.3 },
         frequency: 3.5,
@@ -1763,6 +1799,9 @@
       },
       A07: {
         name: '熬夜修复',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.62, to: 1.38, decline: 14.8 },
         saveRate: { from: 0.55, to: 0.50, decline: 9.1 },
         frequency: 2.6,
@@ -1782,6 +1821,9 @@
       },
       A09: {
         name: '急救精华',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 2.3, to: 1.55, decline: 32.6 },
         saveRate: { from: 0.75, to: 0.52, decline: 30.7 },
         frequency: 4.5,
@@ -1801,6 +1843,9 @@
       },
       A10: {
         name: '日常护肤',
+        industry: 'beauty',
+        category: 'skincare',
+        platform: 'xiaohongshu',
         ctr: { from: 1.35, to: 1.28, decline: 5.2 },
         saveRate: { from: 0.48, to: 0.46, decline: 4.2 },
         frequency: 1.9,
@@ -1817,6 +1862,182 @@
         ],
         recommendation: '继续常规投放，定期巡检即可。',
         canRenew: false
+      },
+      D01: {
+        name: '降噪耳机',
+        industry: 'digital',
+        category: 'audio',
+        platform: 'douyin',
+        ctr: { from: 2.5, to: 1.48, decline: 40.8 },
+        saveRate: { from: 0.62, to: 0.41, decline: 33.9 },
+        frequency: 4.1,
+        fatigue: 89,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+38.5%',
+        diagnosis: '功能卖点型钩子重复度高，"降噪""沉浸"等关键词过度使用，用户审美疲劳严重。',
+        timeline: [
+          { title: '钩子高度重复', desc: '"沉浸式降噪"出现频率过高，用户产生免疫力' },
+          { title: 'CTR大幅下滑', desc: '从 2.5% 降至 1.48%，降幅达 40.8%' },
+          { title: '评论负面信号', desc: '19% 评论提到"又是降噪广告""开头看腻了"' }
+        ],
+        recommendation: '保留产品图与核心功能卖点，只改入口钩子文案，尝试场景化表达。',
+        canRenew: true
+      },
+      D02: {
+        name: '轻薄笔记本',
+        industry: 'digital',
+        category: 'laptop',
+        platform: 'xiaohongshu',
+        ctr: { from: 1.95, to: 1.32, decline: 32.3 },
+        saveRate: { from: 0.58, to: 0.45, decline: 22.4 },
+        frequency: 3.6,
+        fatigue: 84,
+        level: 'high',
+        variable: '视觉',
+        variableName: '视觉构图',
+        improve: '+29.0%',
+        diagnosis: '产品图构图单一，长期以纯白背景45度角展示，视觉新鲜感耗尽。',
+        timeline: [
+          { title: '视觉构图重复', desc: '连续多条素材使用相似纯白背景产品图' },
+          { title: 'CTR持续下滑', desc: '从 1.95% 降至 1.32%，降幅 32.3%' },
+          { title: '点击意愿下降', desc: '11% 评论"图都一样，不想点"' }
+        ],
+        recommendation: '更换封面视觉风格，尝试场景化/生活方式构图，文案与卖点保持不变。',
+        canRenew: true
+      },
+      F01: {
+        name: '低卡零食',
+        industry: 'food',
+        category: 'snack',
+        platform: 'douyin',
+        ctr: { from: 2.2, to: 1.65, decline: 25.0 },
+        saveRate: { from: 0.55, to: 0.42, decline: 23.6 },
+        frequency: 3.3,
+        fatigue: 81,
+        level: 'high',
+        variable: '卖点',
+        variableName: '卖点层级',
+        improve: '+22.0%',
+        diagnosis: '卖点层级混乱，低卡、高蛋白、无蔗糖、饱腹感等信息同时堆砌，用户决策成本高。',
+        timeline: [
+          { title: '信息密度过高', desc: '单条素材同时强调 5 个以上卖点' },
+          { title: '收藏率下滑', desc: '从 0.55% 降至 0.42%，用户记不住核心利益点' },
+          { title: '评论反馈', desc: '14% 评论"卖点太多，不知道主打什么"' }
+        ],
+        recommendation: '只调整卖点排序，突出单一核心利益点，钩子和视觉保持不变。',
+        canRenew: true
+      },
+      F02: {
+        name: '即饮咖啡',
+        industry: 'food',
+        category: 'beverage',
+        platform: 'xiaohongshu',
+        ctr: { from: 2.05, to: 1.28, decline: 37.6 },
+        saveRate: { from: 0.61, to: 0.40, decline: 34.4 },
+        frequency: 4.3,
+        fatigue: 90,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+41.0%',
+        diagnosis: '场景化钩子从有效到疲劳，"早八必备""打工人的续命水"等表达被过度使用。',
+        timeline: [
+          { title: '场景钩子饱和', desc: '"打工人""早八"等场景词高频出现' },
+          { title: 'CTR大幅下滑', desc: '从 2.05% 降至 1.28%，降幅 37.6%' },
+          { title: '用户反感', desc: '21% 评论"又是打工人咖啡"' }
+        ],
+        recommendation: '更换钩子表达角度，从情绪共鸣转向具体使用场景或问题引导。',
+        canRenew: true
+      },
+      F03: {
+        name: '蛋白棒',
+        industry: 'food',
+        category: 'health',
+        platform: 'douyin',
+        ctr: { from: 1.72, to: 1.55, decline: 9.9 },
+        saveRate: { from: 0.49, to: 0.46, decline: 6.1 },
+        frequency: 2.7,
+        fatigue: 68,
+        level: 'medium',
+        variable: '合规',
+        variableName: '合规优化',
+        improve: '—',
+        diagnosis: '存在合规风险，"减脂必备"等功效宣称可能触发平台审核，但当前疲劳程度未达高阈值。',
+        timeline: [
+          { title: '功效宣称风险', desc: '"减脂必备"等表述存在违规风险' },
+          { title: 'CTR轻微下滑', desc: '从 1.72% 降至 1.55%，降幅 9.9%' },
+          { title: '用户质疑', desc: '8% 评论质疑功效宣传真实性' }
+        ],
+        recommendation: '优先修复合规表达，将功效词改为体验描述，再观察疲劳情况。',
+        canRenew: false
+      },
+      E01: {
+        name: '考研课程',
+        industry: 'education',
+        category: 'course',
+        platform: 'xiaohongshu',
+        ctr: { from: 2.35, to: 1.42, decline: 39.6 },
+        saveRate: { from: 0.68, to: 0.44, decline: 35.3 },
+        frequency: 4.6,
+        fatigue: 93,
+        level: 'high',
+        variable: '钩子',
+        variableName: '钩子表达',
+        improve: '+46.0%',
+        diagnosis: '焦虑型钩子快速疲劳，"再不学就晚了""上岸秘诀"等表达引发用户抵触情绪。',
+        timeline: [
+          { title: '焦虑钩子饱和', desc: '"上岸""逆袭"等词高频出现，用户产生免疫力' },
+          { title: 'CTR暴跌', desc: '从 2.35% 降至 1.42%，降幅 39.6%' },
+          { title: '负面评论上升', desc: '24% 评论"贩卖焦虑""又是这种开头"' }
+        ],
+        recommendation: '从焦虑型钩子转向价值型/问题型钩子，强调知识结构与学习方法。',
+        canRenew: true
+      },
+      E02: {
+        name: '编程入门',
+        industry: 'education',
+        category: 'course',
+        platform: 'douyin',
+        ctr: { from: 1.45, to: 1.32, decline: 9.0 },
+        saveRate: { from: 0.52, to: 0.48, decline: 7.7 },
+        frequency: 2.5,
+        fatigue: 66,
+        level: 'medium',
+        variable: '卖点',
+        variableName: '卖点层级',
+        improve: '+14.0%',
+        diagnosis: '课程价值点排序问题，零基础、高薪、项目实战、体系化等卖点同时出现，用户难以建立优先级。',
+        timeline: [
+          { title: '卖点层级不清', desc: '多个价值点平铺，缺乏核心记忆点' },
+          { title: 'CTR缓慢下滑', desc: '从 1.45% 降至 1.32%，降幅 9.0%' },
+          { title: '咨询质量低', desc: '10% 用户咨询时反复询问"适合零基础吗"' }
+        ],
+        recommendation: '优化卖点层级，先突出最匹配目标人群的单一价值点。',
+        canRenew: false
+      },
+      E03: {
+        name: '少儿英语',
+        industry: 'education',
+        category: 'course',
+        platform: 'xiaohongshu',
+        ctr: { from: 1.68, to: 1.45, decline: 13.7 },
+        saveRate: { from: 0.56, to: 0.50, decline: 10.7 },
+        frequency: 2.9,
+        fatigue: 73,
+        level: 'medium',
+        variable: '视觉',
+        variableName: '视觉构图',
+        improve: '—',
+        diagnosis: '儿童素材视觉审美疲劳，长期使用卡通形象 + 大字号标题的固定版式，家长用户新鲜感下降。',
+        timeline: [
+          { title: '视觉版式固化', desc: '连续素材使用相似卡通风格与版式' },
+          { title: 'CTR下滑', desc: '从 1.68% 降至 1.45%，降幅 13.7%' },
+          { title: '家长反馈', desc: '9% 评论"看起来都差不多"' }
+        ],
+        recommendation: '更新视觉风格，尝试真实场景或教育成果展示，当前疲劳未达高阈值可暂缓。',
+        canRenew: false
       }
     };
 
@@ -1830,7 +2051,8 @@
       format: 'image-text',
       stage: 'active',
       window: '7d',
-      view: 'high'
+      view: 'high',
+      industry: 'all'
     };
 
     function updateFilterState(key, value) {
@@ -1838,10 +2060,20 @@
       refreshAllByFilter();
     }
 
+    function updateIndustryFilter(value) {
+      filterState.industry = value;
+      const current = materialDiagnosis[selectedMaterial];
+      if (value !== 'all' && (!current || current.industry !== value)) {
+        const firstInIndustry = Object.keys(materialDiagnosis).find(id => materialDiagnosis[id].industry === value);
+        if (firstInIndustry) selectedMaterial = firstInIndustry;
+      }
+      refreshAllByFilter();
+    }
+
     function refreshAllByFilter() {
       renderStats();
       renderMaterialList();
-      renderDiagnosis();
+      renderDiagnosis(selectedMaterial);
       renderFilterResultBadge();
     }
 
@@ -1907,6 +2139,51 @@
           { id: 'B01', name: '功效优先', hook: '成分党', tag: '功效优先', sellingPoints: ['7天提亮', '烟酰胺+玻尿酸', '温和配方'], cta: '了解成分', structure: '功效→成分→证明' },
           { id: 'B02', name: '成分优先', hook: '成分党', tag: '成分优先', sellingPoints: ['烟酰胺+玻尿酸', '7天提亮', '温和配方'], cta: '了解成分', structure: '成分→功效→证明' },
           { id: 'B03', name: '场景优先', hook: '成分党', tag: '场景优先', sellingPoints: ['熬夜后修护', '烟酰胺+玻尿酸', '7天提亮'], cta: '了解成分', structure: '场景→功效→成分' }
+        ]
+      },
+      D01: {
+        type: '钩子',
+        control: { hook: '沉浸式降噪，一秒安静', ctr: '1.48%', tag: '原版', sellingPoints: ['主动降噪芯片', '40小时续航', '舒适佩戴'], cta: '查看耳机' },
+        variants: [
+          { id: 'B01', name: '场景钩子', hook: '地铁上的嘈杂，一键消失', tag: '场景钩子', sellingPoints: ['通勤场景降噪', '40小时续航', '舒适佩戴'], cta: '查看耳机' },
+          { id: 'B02', name: '问题钩子', hook: '为什么你的耳机总让你调高音量？', tag: '问题钩子', sellingPoints: ['降噪保护听力', '40小时续航', '舒适佩戴'], cta: '了解原因' },
+          { id: 'B03', name: '体验钩子', hook: '戴上它，世界只剩下你和音乐', tag: '体验钩子', sellingPoints: ['沉浸式听感', '40小时续航', '舒适佩戴'], cta: '体验沉浸' }
+        ]
+      },
+      D02: {
+        type: '视觉',
+        control: { hook: '轻薄笔记本', ctr: '1.32%', tag: '原版', sellingPoints: ['1.2kg超轻', '12小时续航', '2.8K屏'], cta: '查看电脑', visualStyle: '纯白产品图', imageUrl: 'images/digital-placeholder.svg' },
+        variants: [
+          { id: 'B01', name: '场景风', hook: '轻薄笔记本', tag: '场景风', sellingPoints: ['1.2kg超轻', '12小时续航', '2.8K屏'], cta: '查看电脑', visualStyle: '咖啡厅场景', imageUrl: 'images/digital-placeholder.svg' },
+          { id: 'B02', name: '细节风', hook: '轻薄笔记本', tag: '细节风', sellingPoints: ['1.2kg超轻', '12小时续航', '2.8K屏'], cta: '查看电脑', visualStyle: '接口/重量特写', imageUrl: 'images/digital-placeholder.svg' },
+          { id: 'B03', name: '生活风', hook: '轻薄笔记本', tag: '生活风', sellingPoints: ['1.2kg超轻', '12小时续航', '2.8K屏'], cta: '查看电脑', visualStyle: '移动办公场景', imageUrl: 'images/digital-placeholder.svg' }
+        ]
+      },
+      F01: {
+        type: '卖点',
+        control: { hook: '低卡零食', ctr: '1.65%', tag: '原版', sellingPoints: ['每包仅80卡', '高蛋白', '无蔗糖', '饱腹感强'], cta: '了解零食', structure: '低卡→蛋白→无蔗糖→饱腹' },
+        variants: [
+          { id: 'B01', name: '低卡优先', hook: '低卡零食', tag: '低卡优先', sellingPoints: ['每包仅80卡', '饱腹感强', '高蛋白', '无蔗糖'], cta: '了解零食', structure: '低卡→饱腹→蛋白→无蔗糖' },
+          { id: 'B02', name: '蛋白优先', hook: '低卡零食', tag: '蛋白优先', sellingPoints: ['高蛋白', '每包仅80卡', '饱腹感强', '无蔗糖'], cta: '了解零食', structure: '蛋白→低卡→饱腹→无蔗糖' },
+          { id: 'B03', name: '口感优先', hook: '低卡零食', tag: '口感优先', sellingPoints: ['酥脆好吃', '每包仅80卡', '高蛋白', '饱腹感强'], cta: '了解零食', structure: '口感→低卡→蛋白→饱腹' }
+        ]
+      },
+      F02: {
+        type: '钩子',
+        control: { hook: '打工人续命水', ctr: '1.28%', tag: '原版', sellingPoints: ['0糖0脂', '提神醒脑', '便携装'], cta: '立即购买' },
+        variants: [
+          { id: 'B01', name: '场景钩子', hook: '下午3点开会前，来一瓶', tag: '场景钩子', sellingPoints: ['下午提神', '0糖0脂', '便携装'], cta: '立即购买' },
+          { id: 'B02', name: '问题钩子', hook: '为什么你喝咖啡还是困？', tag: '问题钩子', sellingPoints: ['咖啡因含量科学', '0糖0脂', '便携装'], cta: '了解原因' },
+          { id: 'B03', name: '体验钩子', hook: '一瓶咖啡，唤醒一整天的专注', tag: '体验钩子', sellingPoints: ['持续清醒', '0糖0脂', '便携装'], cta: '体验清醒' }
+        ]
+      },
+      E01: {
+        type: '钩子',
+        control: { hook: '再不学就晚了', ctr: '1.42%', tag: '原版', sellingPoints: ['全科系统课', '名师答疑', '真题解析'], cta: '立即试听' },
+        variants: [
+          { id: 'B01', name: '价值钩子', hook: '一份可执行的考研复习路线图', tag: '价值钩子', sellingPoints: ['全科系统课', '名师答疑', '真题解析'], cta: '获取路线' },
+          { id: 'B02', name: '问题钩子', hook: '考研复习总是找不到重点？', tag: '问题钩子', sellingPoints: ['重难点拆解', '名师答疑', '真题解析'], cta: '了解方法' },
+          { id: 'B03', name: '场景钩子', hook: '从混乱到清晰，只需一套复习系统', tag: '场景钩子', sellingPoints: ['系统规划', '名师答疑', '真题解析'], cta: '试听系统' }
         ]
       }
     };
@@ -2245,9 +2522,14 @@
 
     function filterMaterials(view) {
       const all = getSortedMaterials();
-      if (view === 'high') return all.filter(([_, d]) => d.fatigue >= 80);
-      if (view === 'medium') return all.filter(([_, d]) => d.fatigue >= 60);
-      return all;
+      const industry = filterState.industry;
+      let filtered = all;
+      if (industry !== 'all') {
+        filtered = all.filter(([_, d]) => d.industry === industry);
+      }
+      if (view === 'high') return filtered.filter(([_, d]) => d.fatigue >= 80);
+      if (view === 'medium') return filtered.filter(([_, d]) => d.fatigue >= 60);
+      return filtered;
     }
 
     function renderMaterialList() {
@@ -2255,17 +2537,22 @@
       const container = document.getElementById('materialList');
       const showCount = Math.min(displayedCount, materials.length);
 
+      const industryNames = { beauty: '美妆护肤', digital: '3C数码', food: '食品饮料', education: '在线教育' };
+      const industryColors = { beauty: '#FF6B9D', digital: '#4A90D9', food: '#F5A623', education: '#7ED321' };
+
       container.innerHTML = materials.slice(0, showCount).map(([id, d]) => {
         // 优先使用真实封面图，回落到 emoji
         const cover = materialCovers[id];
         const previewHtml = cover
           ? `<div class="material-preview" style="padding: 0; overflow: hidden;"><img src="${cover}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;" alt="${d.name}"></div>`
           : `<div class="material-preview">${d.fatigue >= 80 ? '🌟' : d.fatigue >= 60 ? '📊' : '💼'}</div>`;
+        const industryLabel = industryNames[d.industry] || '其他';
+        const industryColor = industryColors[d.industry] || '#999';
         return `
         <div class="material-item ${id === selectedMaterial ? 'selected' : ''}" data-id="${id}" onclick="selectMaterial('${id}')">
           ${previewHtml}
           <div class="material-info">
-            <div class="material-name">${id} · ${d.name}</div>
+            <div class="material-name">${id} · ${d.name}<span style="margin-left: 8px; padding: 1px 6px; border-radius: 8px; font-size: 10px; color: white; background: ${industryColor}; vertical-align: middle;">${industryLabel}</span></div>
             <div class="material-metrics">
               <span>CTR: ${d.ctr.to}% ${d.ctr.decline > 0 ? '↓' : '→'}</span>
               <span>疲劳指数: ${d.fatigue}</span>
@@ -2295,7 +2582,8 @@
       const all = Object.entries(materialDiagnosis);
       // 按当前 filter 模拟筛选
       let filtered = all;
-      if (filterState.campaign !== 'all') filtered = all.slice(0, Math.ceil(all.length * 0.67));
+      if (filterState.industry !== 'all') filtered = filtered.filter(([_, d]) => d.industry === filterState.industry);
+      if (filterState.campaign !== 'all') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.67));
       if (filterState.stage === 'decline') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.5));
       if (filterState.view === 'high') filtered = filtered.filter(([_, d]) => d.fatigue >= 80);
       else if (filterState.view === 'medium') filtered = filtered.filter(([_, d]) => d.fatigue >= 60);
@@ -2357,7 +2645,8 @@
     function renderFilterResultBadge() {
       const all = Object.entries(materialDiagnosis);
       let filtered = all;
-      if (filterState.campaign !== 'all') filtered = all.slice(0, Math.ceil(all.length * 0.67));
+      if (filterState.industry !== 'all') filtered = filtered.filter(([_, d]) => d.industry === filterState.industry);
+      if (filterState.campaign !== 'all') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.67));
       if (filterState.stage === 'decline') filtered = filtered.slice(0, Math.ceil(filtered.length * 0.5));
       if (filterState.view === 'high') filtered = filtered.filter(([_, d]) => d.fatigue >= 80);
       else if (filterState.view === 'medium') filtered = filtered.filter(([_, d]) => d.fatigue >= 60);
