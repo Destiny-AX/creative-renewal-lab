@@ -1,0 +1,559 @@
+app:
+  description: "课堂演示用 Dify Workflow：基于模拟历史素材数据，完成创意疲劳诊断、单变量实验设计、图文变体生成、合规扫描与复盘建议。"
+  icon: "🧪"
+  icon_background: "#FFEAD5"
+  mode: "workflow"
+  name: "创意续命实验台 Demo"
+  use_icon_as_answer_icon: false
+dependencies:
+  - current_identifier: null
+    type: "marketplace"
+    value:
+      marketplace_plugin_unique_identifier: "langgenius/openai:0.3.8@592c8252795b5f75807de2d609a03196ed02596b409f7642b4a07548c7ff57ef"
+      version: null
+kind: "app"
+version: "0.3.0"
+workflow:
+  conversation_variables: []
+  environment_variables: []
+  features:
+    file_upload:
+      enabled: false
+      allowed_file_extensions: []
+      allowed_file_types: []
+      allowed_file_upload_methods: []
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+          - local_file
+          - remote_url
+    opening_statement: ""
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ""
+      voice: ""
+  graph:
+    edges:
+      - id: "edge_start_to_diagnosis"
+        source: "start_node"
+        sourceHandle: "source"
+        target: "diagnosis_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "start"
+          targetType: "llm"
+      - id: "edge_diagnosis_to_matrix"
+        source: "diagnosis_node"
+        sourceHandle: "source"
+        target: "matrix_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "llm"
+          targetType: "llm"
+      - id: "edge_matrix_to_variants"
+        source: "matrix_node"
+        sourceHandle: "source"
+        target: "variants_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "llm"
+          targetType: "llm"
+      - id: "edge_variants_to_compliance"
+        source: "variants_node"
+        sourceHandle: "source"
+        target: "compliance_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "llm"
+          targetType: "llm"
+      - id: "edge_compliance_to_report"
+        source: "compliance_node"
+        sourceHandle: "source"
+        target: "report_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "llm"
+          targetType: "llm"
+      - id: "edge_report_to_end"
+        source: "report_node"
+        sourceHandle: "source"
+        target: "end_node"
+        targetHandle: "target"
+        type: "custom"
+        data:
+          isInIteration: false
+          isInLoop: false
+          sourceType: "llm"
+          targetType: "end"
+    nodes:
+      - id: "start_node"
+        type: "custom"
+        position:
+          x: 0
+          y: 120
+        positionAbsolute:
+          x: 0
+          y: 120
+        width: 244
+        height: 170
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "Start"
+          desc: "输入模拟 campaign brief、历史素材数据和合规规则。"
+          type: "start"
+          selected: false
+          variables:
+            - label: "Campaign Brief"
+              variable: "campaign_brief"
+              type: "paragraph"
+              required: true
+              max_length: 4000
+              options: []
+            - label: "历史素材与基础表现信息"
+              variable: "history_materials"
+              type: "paragraph"
+              required: true
+              max_length: 6000
+              options: []
+            - label: "合规规则"
+              variable: "compliance_rules"
+              type: "paragraph"
+              required: true
+              max_length: 3000
+              options: []
+          x-outputs:
+            - name: "campaign_brief"
+              type: "string"
+            - name: "history_materials"
+              type: "string"
+            - name: "compliance_rules"
+              type: "string"
+      - id: "diagnosis_node"
+        type: "custom"
+        position:
+          x: 330
+          y: 120
+        positionAbsolute:
+          x: 330
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "疲劳诊断与变量推荐"
+          desc: "根据模拟历史素材识别疲劳素材，并推荐本轮优先测试变量。"
+          type: "llm"
+          selected: false
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            provider: "langgenius/openai/openai"
+            name: "gpt-4o-mini"
+            mode: "chat"
+            completion_params:
+              temperature: 0.25
+              max_tokens: 1600
+          prompt_template:
+            - id: "diagnosis_system_prompt"
+              role: "system"
+              text: |-
+                你是信息流广告创意优化助手，服务对象是代理公司或品牌投放团队中的信息流优化师。
+
+                你的任务是基于模拟历史素材和基础表现信息，完成创意疲劳诊断，并推荐本轮最适合测试的单一主变量。
+
+                重要限制：
+                - 这是课堂 demo，不接入真实广告平台。
+                - 不要声称你在做真实 CTR/CVR 预测。
+                - 可以基于输入数据做课程演示级估算。
+                - 输出必须服务于“创意续命实验台”的产品逻辑：先诊断疲劳，再设计单变量实验。
+
+                Campaign Brief：
+                {{#start_node.campaign_brief#}}
+
+                历史素材数据：
+                {{#start_node.history_materials#}}
+
+                请按以下结构输出：
+
+                ## 1. 疲劳素材判断
+                - 哪些素材进入高疲劳或中疲劳
+                - 判断依据：投放天数、CTR 下降趋势、创意重复情况
+
+                ## 2. 疲劳原因拆解
+                请给出课程演示级估算：
+                - 钩子重复度
+                - 卖点重复度
+                - 构图重复度
+                - CTA 重复度
+
+                ## 3. 本轮推荐优先测试变量
+                只能推荐一个主变量。
+                请说明为什么优先测试它，以及为什么暂时不先改其他变量。
+
+                ## 4. 课堂解释
+                用一句话解释：为什么这一步不是直接生成素材，而是先做疲劳诊断。
+          variables: []
+          vision:
+            enabled: false
+          x-outputs:
+            - name: "text"
+              type: "string"
+          x-io-contracts:
+            fixed_outputs:
+              - name: "text"
+                type: "string"
+      - id: "matrix_node"
+        type: "custom"
+        position:
+          x: 660
+          y: 120
+        positionAbsolute:
+          x: 660
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "单变量实验矩阵"
+          desc: "根据疲劳诊断结果生成 A/B 式单变量实验矩阵。"
+          type: "llm"
+          selected: false
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            provider: "langgenius/openai/openai"
+            name: "gpt-4o-mini"
+            mode: "chat"
+            completion_params:
+              temperature: 0.25
+              max_tokens: 1600
+          prompt_template:
+            - id: "matrix_system_prompt"
+              role: "system"
+              text: |-
+                你是广告创意实验设计助手。请根据上一步的疲劳诊断结果，设计一轮单变量实验。
+
+                上一步诊断结果：
+                {{#diagnosis_node.text#}}
+
+                Campaign Brief：
+                {{#start_node.campaign_brief#}}
+
+                要求：
+                - 本轮只允许测试一个主变量。
+                - 必须设置 A 对照组。
+                - 生成 B、C、D 三个变体组。
+                - 除主变量外，主卖点、构图方向、CTA 框架尽量保持一致。
+                - 不要把这一步写成真实投放结果预测。
+
+                请输出：
+
+                ## 1. 实验目标
+
+                ## 2. 主变量与固定项
+
+                ## 3. 实验矩阵
+                用 Markdown 表格输出：
+                - 组别
+                - 变量类型
+                - 标题方向
+                - 固定项
+                - 预期用途
+
+                ## 4. 复盘价值说明
+                用一句话说明：为什么单变量实验比一次性大改所有元素更适合复盘。
+          variables: []
+          vision:
+            enabled: false
+          x-outputs:
+            - name: "text"
+              type: "string"
+          x-io-contracts:
+            fixed_outputs:
+              - name: "text"
+                type: "string"
+      - id: "variants_node"
+        type: "custom"
+        position:
+          x: 990
+          y: 120
+        positionAbsolute:
+          x: 990
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "图文变体生成"
+          desc: "按照实验矩阵生成对照组与变体组的图文广告方案。"
+          type: "llm"
+          selected: false
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            provider: "langgenius/openai/openai"
+            name: "gpt-4o-mini"
+            mode: "chat"
+            completion_params:
+              temperature: 0.55
+              max_tokens: 2200
+          prompt_template:
+            - id: "variants_system_prompt"
+              role: "system"
+              text: |-
+                你是美妆护肤信息流广告创意助手。请根据 Campaign Brief 和实验矩阵，生成图文广告变体。
+
+                Campaign Brief：
+                {{#start_node.campaign_brief#}}
+
+                实验矩阵：
+                {{#matrix_node.text#}}
+
+                要求：
+                - 生成 A、B、C、D 四组版本。
+                - A 是对照组。
+                - B、C、D 只改变本轮主变量。
+                - 主卖点、构图方向、CTA 框架尽量保持一致。
+                - 不要承诺真实美白、医学效果或确定性转化效果。
+                - 输出用于课堂演示，不代表真实投放效果预测。
+
+                每组输出：
+                - 版本名称
+                - 标题
+                - 封面文案
+                - 主文案
+                - 构图说明
+                - CTA
+                - 与对照组相比改变了什么
+
+                最后补充一段“为什么这些变体可比较”。
+          variables: []
+          vision:
+            enabled: false
+          x-outputs:
+            - name: "text"
+              type: "string"
+          x-io-contracts:
+            fixed_outputs:
+              - name: "text"
+                type: "string"
+      - id: "compliance_node"
+        type: "custom"
+        position:
+          x: 1320
+          y: 120
+        positionAbsolute:
+          x: 1320
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "合规扫描与改写建议"
+          desc: "扫描图文变体中的风险表达，输出改写建议。"
+          type: "llm"
+          selected: false
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            provider: "langgenius/openai/openai"
+            name: "gpt-4o-mini"
+            mode: "chat"
+            completion_params:
+              temperature: 0.2
+              max_tokens: 2200
+          prompt_template:
+            - id: "compliance_system_prompt"
+              role: "system"
+              text: |-
+                你是广告合规预检助手。请根据合规规则，对上一步生成的图文广告变体进行风险扫描。
+
+                合规规则：
+                {{#start_node.compliance_rules#}}
+
+                待扫描广告变体：
+                {{#variants_node.text#}}
+
+                请输出：
+
+                ## 1. 风险总览
+                - 高风险数量
+                - 中风险数量
+                - 低风险数量
+
+                ## 2. 风险明细
+                每条风险包括：
+                - 所属版本
+                - 风险句
+                - 风险等级
+                - 风险原因
+                - 建议改写
+
+                ## 3. 修改后可用版本建议
+                说明哪些版本可以优先保留，哪些需要修改后再进入候选。
+
+                ## 4. 课堂解释
+                用一句话解释为什么要把合规检查前置到生成链路。
+          variables: []
+          vision:
+            enabled: false
+          x-outputs:
+            - name: "text"
+              type: "string"
+          x-io-contracts:
+            fixed_outputs:
+              - name: "text"
+                type: "string"
+      - id: "report_node"
+        type: "custom"
+        position:
+          x: 1650
+          y: 120
+        positionAbsolute:
+          x: 1650
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "最终报告整理"
+          desc: "汇总前面节点结果，形成课堂可展示的 Markdown 报告。"
+          type: "llm"
+          selected: false
+          context:
+            enabled: false
+            variable_selector: []
+          model:
+            provider: "langgenius/openai/openai"
+            name: "gpt-4o-mini"
+            mode: "chat"
+            completion_params:
+              temperature: 0.25
+              max_tokens: 2600
+          prompt_template:
+            - id: "report_system_prompt"
+              role: "system"
+              text: |-
+                你是 AI 产品课程作业的演示报告整理助手。请把以下工作流结果整理成一份结构清晰的 Markdown 报告。
+
+                疲劳诊断：
+                {{#diagnosis_node.text#}}
+
+                实验矩阵：
+                {{#matrix_node.text#}}
+
+                图文变体：
+                {{#variants_node.text#}}
+
+                合规扫描：
+                {{#compliance_node.text#}}
+
+                请按以下结构输出：
+
+                # 创意续命实验台 Demo 输出报告
+
+                ## 1. 输入说明
+                简述本 demo 使用的是模拟历史素材和模拟表现数据，不接入真实广告平台。
+
+                ## 2. 疲劳诊断结论
+
+                ## 3. 单变量实验设计
+
+                ## 4. 图文变体方案
+
+                ## 5. 合规扫描结果
+
+                ## 6. 建议上线顺序
+
+                ## 7. 下轮优化建议
+
+                ## 8. 课堂讲解总结
+                用 3 句话说明：为什么本 demo 展示的是流程设计创新，而不是简单批量生成素材。
+          variables: []
+          vision:
+            enabled: false
+          x-outputs:
+            - name: "text"
+              type: "string"
+          x-io-contracts:
+            fixed_outputs:
+              - name: "text"
+                type: "string"
+      - id: "end_node"
+        type: "custom"
+        position:
+          x: 1980
+          y: 120
+        positionAbsolute:
+          x: 1980
+          y: 120
+        width: 244
+        height: 118
+        sourcePosition: "right"
+        targetPosition: "left"
+        selected: false
+        data:
+          title: "End"
+          desc: "输出最终 Markdown 报告。"
+          type: "end"
+          selected: false
+          outputs:
+            - variable: "final_report"
+              value_selector:
+                - "report_node"
+                - "text"
+          x-outputs:
+            - name: "final_report"
+              type: "string"
+    viewport:
+      x: 0
+      y: 0
+      zoom: 0.75

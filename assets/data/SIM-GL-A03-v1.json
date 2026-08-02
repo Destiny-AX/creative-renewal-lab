@@ -1,0 +1,171 @@
+{
+  "dataset_id": "SIM-GL-A03-v1",
+  "scope": "AI 产品课程课堂演示模拟数据，不代表真实广告平台表现",
+  "campaign_brief": {
+    "brand": "GlowLab",
+    "product": "焕亮修护精华",
+    "industry": "美妆护肤",
+    "content_format": "图文信息流广告",
+    "platform": "小红书 / 抖音图文信息流",
+    "audience": "25-35 岁城市通勤女性",
+    "core_selling_points": ["熬夜后暗沉", "肤色不均", "屏障修护", "温和肤感"],
+    "compliance_constraints": ["不使用绝对化表达", "不承诺具体天数功效", "不使用医疗化修复表述", "不泛化敏感肌适用性"]
+  },
+  "historical_materials": [
+    {
+      "id": "A03",
+      "name": "熬夜脸急救",
+      "hook": "熬夜脸急救",
+      "visual": "精华瓶特写 + 达人口吻封面",
+      "cta": "查看修护方案",
+      "first_7d": { "impressions": 120000, "ctr": 0.0182, "save_rate": 0.0064, "conversion_intent": 0.0031 },
+      "recent_7d": { "impressions": 118000, "ctr": 0.0113, "save_rate": 0.0042, "conversion_intent": 0.0024 },
+      "recent_frequency": 3.8,
+      "comment_signals": { "repetition_ratio": 0.18, "examples": ["像之前那条", "开头没新意", "又是熬夜急救"] },
+      "fatigue_score": 88,
+      "diagnosis": "入口钩子重复，第一眼进入理由变弱；产品图和卖点层级仍可保留。"
+    },
+    {
+      "id": "A06",
+      "name": "成分科普",
+      "hook": "泛醇 + 烟酰胺的修护思路",
+      "visual": "成分卡片 + 质地图",
+      "cta": "了解成分思路",
+      "first_7d": { "impressions": 96000, "ctr": 0.0136, "save_rate": 0.0071, "conversion_intent": 0.0027 },
+      "recent_7d": { "impressions": 91000, "ctr": 0.0128, "save_rate": 0.0062, "conversion_intent": 0.0023 },
+      "recent_frequency": 2.4,
+      "comment_signals": { "repetition_ratio": 0.07, "examples": ["信息有点多", "成分看不懂"] },
+      "fatigue_score": 72,
+      "diagnosis": "未达到高疲劳阈值，问题更像转化承接弱，暂不作为本轮主素材。"
+    },
+    {
+      "id": "A08",
+      "name": "前后对比",
+      "hook": "熬夜后状态对比",
+      "visual": "素人肌肤状态对比",
+      "cta": "查看使用体验",
+      "first_7d": { "impressions": 88000, "ctr": 0.0149, "save_rate": 0.0058, "conversion_intent": 0.0029 },
+      "recent_7d": { "impressions": 85000, "ctr": 0.0131, "save_rate": 0.0050, "conversion_intent": 0.0025 },
+      "recent_frequency": 2.9,
+      "comment_signals": { "repetition_ratio": 0.11, "risk_comment_ratio": 0.14, "examples": ["对比是不是太夸张", "效果看起来有点过"] },
+      "fatigue_score": 69,
+      "diagnosis": "存在合规风险，但表现下滑不如 A03 明显，本轮不优先处理。"
+    },
+    {
+      "id": "A01",
+      "name": "早八通勤妆前",
+      "hook": "早八前的护肤底气",
+      "visual": "通勤桌面 + 产品",
+      "cta": "获取护肤清单",
+      "first_7d": { "impressions": 76000, "ctr": 0.0151, "save_rate": 0.0056, "conversion_intent": 0.0028 },
+      "recent_7d": { "impressions": 79000, "ctr": 0.0144, "save_rate": 0.0053, "conversion_intent": 0.0027 },
+      "recent_frequency": 2.1,
+      "comment_signals": { "repetition_ratio": 0.05, "examples": ["通勤场景挺真实"] },
+      "fatigue_score": 54,
+      "diagnosis": "表现基本稳定。"
+    },
+    {
+      "id": "A02",
+      "name": "轻薄质地",
+      "hook": "不黏腻的晚间修护",
+      "visual": "质地延展图",
+      "cta": "查看质地测评",
+      "first_7d": { "impressions": 69000, "ctr": 0.0122, "save_rate": 0.0048, "conversion_intent": 0.0021 },
+      "recent_7d": { "impressions": 71000, "ctr": 0.0117, "save_rate": 0.0045, "conversion_intent": 0.0020 },
+      "recent_frequency": 1.9,
+      "comment_signals": { "repetition_ratio": 0.04, "examples": ["想看上脸肤感"] },
+      "fatigue_score": 49,
+      "diagnosis": "轻微衰减，暂不处理。"
+    },
+    {
+      "id": "A04",
+      "name": "屏障修护",
+      "hook": "换季也想稳住肤感",
+      "visual": "换季场景 + 产品",
+      "cta": "查看修护流程",
+      "first_7d": { "impressions": 83000, "ctr": 0.0140, "save_rate": 0.0060, "conversion_intent": 0.0026 },
+      "recent_7d": { "impressions": 82000, "ctr": 0.0135, "save_rate": 0.0057, "conversion_intent": 0.0025 },
+      "recent_frequency": 2.2,
+      "comment_signals": { "repetition_ratio": 0.06, "examples": ["适合换季看"] },
+      "fatigue_score": 52,
+      "diagnosis": "表现稳定。"
+    },
+    {
+      "id": "A05",
+      "name": "成套护肤流程",
+      "hook": "晚间三步稳住状态",
+      "visual": "流程卡片",
+      "cta": "保存流程",
+      "first_7d": { "impressions": 61000, "ctr": 0.0119, "save_rate": 0.0067, "conversion_intent": 0.0019 },
+      "recent_7d": { "impressions": 64000, "ctr": 0.0116, "save_rate": 0.0065, "conversion_intent": 0.0018 },
+      "recent_frequency": 1.7,
+      "comment_signals": { "repetition_ratio": 0.03, "examples": ["流程可以保存"] },
+      "fatigue_score": 43,
+      "diagnosis": "收藏稳定，暂不处理。"
+    },
+    {
+      "id": "A07",
+      "name": "敏感肌温和表达",
+      "hook": "先做局部测试，再安心叠加",
+      "visual": "温和配方说明",
+      "cta": "了解使用建议",
+      "first_7d": { "impressions": 57000, "ctr": 0.0108, "save_rate": 0.0049, "conversion_intent": 0.0018 },
+      "recent_7d": { "impressions": 59000, "ctr": 0.0105, "save_rate": 0.0047, "conversion_intent": 0.0017 },
+      "recent_frequency": 1.6,
+      "comment_signals": { "repetition_ratio": 0.02, "examples": ["这个说法比较稳"] },
+      "fatigue_score": 39,
+      "diagnosis": "低疲劳，合规表达可作为知识库样本。"
+    }
+  ],
+  "fatigue_scoring": {
+    "weights": {
+      "ctr_relative_decline": 0.35,
+      "save_rate_decline": 0.25,
+      "recent_frequency": 0.20,
+      "comment_repetition_signal": 0.20
+    },
+    "high_fatigue_threshold": 80
+  },
+  "experiment": {
+    "selected_material_id": "A03",
+    "primary_variable": "hook",
+    "supported_primary_variables": [
+      { "key": "hook", "name": "钩子表达", "generated_elements": ["标题", "入口文案"], "fixed_elements": ["产品图", "卖点层级", "CTA", "投放窗口"] },
+      { "key": "visual", "name": "视觉构图", "generated_elements": ["产品特写", "使用场景", "成分质地图"], "fixed_elements": ["标题", "主文案", "卖点层级", "CTA", "投放窗口"] },
+      { "key": "selling_order", "name": "卖点层级", "generated_elements": ["修护优先", "焕亮优先", "温和优先"], "fixed_elements": ["封面构图", "标题风格", "CTA", "投放窗口"] },
+      { "key": "cta", "name": "CTA", "generated_elements": ["查看方案", "保存清单", "了解成分"], "fixed_elements": ["标题", "主文案", "构图", "卖点层级", "投放窗口"] }
+    ],
+    "fixed_variables": ["产品图", "卖点层级", "CTA", "投放窗口", "人群"],
+    "window_hours": 72,
+    "impressions_per_group": 12000,
+    "evaluation_metrics": ["CTR 提升率", "收藏率", "转化倾向", "合规通过状态"],
+    "groups": [
+      { "id": "A03", "role": "control", "hook": "熬夜脸急救", "simulated_ctr": 0.0113, "simulated_save_rate": 0.0042, "status": "baseline" },
+      { "id": "B01", "role": "variant", "hook": "明早有会，今晚的脸别先投降", "simulated_ctr": 0.0158, "simulated_save_rate": 0.0067, "status": "best" },
+      { "id": "B02", "role": "variant", "draft_hook": "暗沉不一定是没睡够，也可能是屏障在求救", "hook": "暗沉不一定只是没睡够，也可能是肌肤状态在提醒你需要修护", "simulated_ctr": 0.0144, "simulated_save_rate": 0.0061, "status": "keep_testing" },
+      { "id": "B03", "role": "variant", "hook": "把熬夜后的疲惫感，藏进护肤流程里", "simulated_ctr": 0.0124, "simulated_save_rate": 0.0049, "status": "observe" }
+    ]
+  },
+  "compliance_audit": [
+    { "variant_id": "B01", "phrase": "明早有会，今晚的脸别先投降", "risk_level": "pass", "risk_type": "无明显风险", "action": "进入候选池" },
+    { "variant_id": "B02", "phrase": "屏障在求救", "risk_level": "low", "risk_type": "拟人化表达偏强", "rewrite": "肌肤状态在提醒你需要修护", "action": "自动生成低风险改写版后进入候选池" },
+    { "variant_id": "B03", "phrase": "把熬夜后的疲惫感，藏进护肤流程里", "risk_level": "pass", "risk_type": "无明显风险", "action": "进入候选池" }
+  ],
+  "review": [
+    {
+      "entry_type": "scale_candidate",
+      "source": "投放实验 / 数据回填",
+      "content": "B01 场景钩子“明早有会，今晚的脸别先投降”CTR 1.58%，较 A03 对照组 +39.8%，收藏率 0.67%，进入放量候选；A03 不再作为主力素材。"
+    },
+    {
+      "entry_type": "compliance_rule",
+      "source": "合规扫描审计",
+      "content": "B02 内部草稿“屏障在求救”拟人化偏强，候选版改为“肌肤状态在提醒你需要修护”。"
+    },
+    {
+      "entry_type": "history_writeback",
+      "source": "复盘看板",
+      "content": "将 A03、B01 和本轮统一口径数据写回历史素材库；下一轮仍需先重新做疲劳诊断，再决定主变量。"
+    }
+  ]
+}
